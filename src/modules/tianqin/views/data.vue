@@ -3,15 +3,14 @@
 		<cl-row>
 			<cl-refresh-btn />
 			<cl-flex1 />
-			<!-- 筛选 -->
-			<cl-filter :label="$t('日期时间')">
-				<cl-select v-model="time" :options="options.time" prop="time" :width="200" />
-			</cl-filter>
 			<cl-filter :label="$t('趋势方向')">
 				<cl-select v-model="trend" :options="options.trend" prop="trend" :width="120" />
 			</cl-filter>
 			<cl-filter :label="$t('当前运行')">
 				<cl-select v-model="band" :options="options.band" prop="band" :width="120" />
+			</cl-filter>
+			<cl-filter :label="$t('状态')">
+				<cl-select v-model="status" :options="options.status" prop="status" :width="120" />
 			</cl-filter>
 			<cl-search-key :placeholder="$t('搜索名称、keyName')" />
 		</cl-row>
@@ -34,7 +33,7 @@ defineOptions({
 	name: 'tianqin-data'
 });
 
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
@@ -44,7 +43,6 @@ const { t } = useI18n();
 
 // 选项
 const options = reactive({
-	time: [] as { label: string; value: string }[],
 	trend: [
 		{
 			label: '多头',
@@ -64,13 +62,23 @@ const options = reactive({
 			label: '次级折返',
 			value: '次级折返'
 		}
+	],
+	status: [
+		{
+			label: '启用',
+			value: 1
+		},
+		{
+			label: '禁用',
+			value: 0
+		}
 	]
 });
 
 // 参数
-const time = ref('');
 const trend = ref('多头');
 const band = ref('次级折返');
+const status = ref(1);
 
 // cl-crud
 const Crud = useCrud(
@@ -79,36 +87,38 @@ const Crud = useCrud(
 		onRefresh(params, { next }) {
 			next({
 				...params,
-				createTime: time.value,
 				trend: trend.value,
 				band: band.value,
-				size: 100
+				status: status.value
 			});
 		}
 	},
 	app => {
-		// 先加载日期时间列表，再加载表格数据
-		service.tianqin.data
-			.request({
-				url: '/times',
-				method: 'GET'
-			})
-			.then((res: string[]) => {
-				options.time = (res || []).map(item => ({
-					label: item,
-					value: item
-				}));
-
-				// 取第一个日期时间作为参数
-				if (options.time.length > 0) {
-					time.value = options.time[0].value;
-				}
-
-				// 加载表格数据
-				app.refresh();
-			});
+		// 加载表格数据
+		app.refresh({
+			size: 100
+		});
 	}
 );
+
+// 自动刷新（每5分钟）
+let refreshTimer: ReturnType<typeof setInterval> | null = null;
+
+onMounted(() => {
+	refreshTimer = setInterval(
+		() => {
+			Crud.value?.refresh();
+		},
+		5 * 60 * 1000
+	);
+});
+
+onUnmounted(() => {
+	if (refreshTimer) {
+		clearInterval(refreshTimer);
+		refreshTimer = null;
+	}
+});
 
 // cl-table
 const Table = useTable({
@@ -121,13 +131,18 @@ const Table = useTable({
 		},
 		{
 			label: t('合约代码'),
-			prop: 'code',
+			prop: 'mainSymbol',
 			minWidth: 100
 		},
 		{
 			label: t('合约名称'),
 			prop: 'name',
 			minWidth: 100
+		},
+		{
+			label: t('更新时间'),
+			prop: 'updateTime',
+			minWidth: 160
 		},
 		{
 			label: t('当前价格'),
@@ -281,20 +296,6 @@ const Upsert = useUpsert({
 				]
 			}
 		}
-	],
-
-	onOpened(data) {
-		data[`data_${data.dataType}`] = data.data;
-	},
-
-	onSubmit(data, { next }) {
-		next({
-			...data,
-			data: data[`data_${data.dataType}`],
-			data_0: undefined,
-			data_1: undefined,
-			data_2: undefined
-		});
-	}
+	]
 });
 </script>

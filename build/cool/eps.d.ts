@@ -854,14 +854,29 @@ declare namespace Eps {
 		id?: number;
 
 		/**
-		 * 合约代码
+		 * 品种代码
 		 */
 		code?: string;
 
 		/**
-		 * 合约名称
+		 * 品种名称
 		 */
 		name?: string;
+
+		/**
+		 * 备注
+		 */
+		remark?: string;
+
+		/**
+		 * 状态
+		 */
+		status?: number;
+
+		/**
+		 * 主力合约
+		 */
+		mainSymbol?: string;
 
 		/**
 		 * 当前价格
@@ -902,48 +917,6 @@ declare namespace Eps {
 		 * 小时CCI值
 		 */
 		hourCciValue?: number;
-
-		/**
-		 * 创建时间
-		 */
-		createTime?: string;
-
-		/**
-		 * 更新时间
-		 */
-		updateTime?: string;
-
-		/**
-		 * 任意键值
-		 */
-		[key: string]: any;
-	}
-
-	interface TianqinTypeEntity {
-		/**
-		 * ID
-		 */
-		id?: number;
-
-		/**
-		 * 代码
-		 */
-		code?: string;
-
-		/**
-		 * 名称
-		 */
-		name?: string;
-
-		/**
-		 * 备注
-		 */
-		remark?: string;
-
-		/**
-		 * 状态
-		 */
-		status?: number;
 
 		/**
 		 * 创建时间
@@ -1173,11 +1146,6 @@ declare namespace Eps {
 	interface TianqinDataPageResponse {
 		pagination: PagePagination;
 		list: TianqinDataEntity[];
-	}
-
-	interface TianqinTypePageResponse {
-		pagination: PagePagination;
-		list: TianqinTypeEntity[];
 	}
 
 	interface UserAddressPageResponse {
@@ -2184,11 +2152,6 @@ declare namespace Eps {
 
 	interface TianqinData {
 		/**
-		 * 时间列表
-		 */
-		times(data?: any): Promise<any>;
-
-		/**
 		 * 分页查询
 		 */
 		page(data?: any): Promise<TianqinDataPageResponse>;
@@ -2196,51 +2159,12 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { times: string; page: string };
+		permission: { page: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { times: boolean; page: boolean };
-
-		request: Request;
-	}
-
-	interface TianqinType {
-		/**
-		 * 修改
-		 */
-		update(data?: any): Promise<any>;
-
-		/**
-		 * 单个信息
-		 */
-		info(data?: any): Promise<TianqinTypeEntity>;
-
-		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<TianqinTypeEntity[]>;
-
-		/**
-		 * 分页查询
-		 */
-		page(data?: any): Promise<TianqinTypePageResponse>;
-
-		/**
-		 * 新增
-		 */
-		add(data?: any): Promise<any>;
-
-		/**
-		 * 权限标识
-		 */
-		permission: { update: string; info: string; list: string; page: string; add: string };
-
-		/**
-		 * 权限状态
-		 */
-		_permission: { update: boolean; info: boolean; list: boolean; page: boolean; add: boolean };
+		_permission: { page: boolean };
 
 		request: Request;
 	}
@@ -2397,7 +2321,7 @@ declare namespace Eps {
 		recycle: { data: RecycleData };
 		space: { info: SpaceInfo; type: SpaceType };
 		task: { info: TaskInfo };
-		tianqin: { data: TianqinData; type: TianqinType };
+		tianqin: { data: TianqinData };
 		user: { address: UserAddress; info: UserInfo };
 	};
 }
