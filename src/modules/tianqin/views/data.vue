@@ -16,7 +16,7 @@
 		</cl-row>
 
 		<cl-row>
-			<cl-table ref="Table" />
+			<cl-table ref="Table" class="data-table" />
 		</cl-row>
 
 		<cl-row>
@@ -37,6 +37,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
+import { ElMessage } from 'element-plus';
 
 const { service } = useCool();
 const { t } = useI18n();
@@ -132,7 +133,7 @@ const Table = useTable({
 		{
 			label: t('合约代码'),
 			prop: 'mainSymbol',
-			minWidth: 100
+			minWidth: 120
 		},
 		{
 			label: t('合约名称'),
@@ -236,7 +237,17 @@ const Table = useTable({
 			label: t('备注'),
 			prop: 'remark',
 			minWidth: 200,
-			showOverflowTooltip: true
+			component: {
+				name: 'cl-code-json',
+				props: {
+					popover: true
+				}
+			}
+		},
+		{
+			type: 'op',
+			width: 100,
+			buttons: ['edit']
 		}
 	]
 });
@@ -299,3 +310,12 @@ const Upsert = useUpsert({
 	]
 });
 </script>
+<style lang="css">
+.data-table .cl-table__op .el-button.is-text {
+	--el-button-size: 24px;
+	height: var(--el-button-size);
+	padding: 5px 11px;
+	font-size: 12px;
+	border-radius: calc(var(--el-border-radius-base) - 1px);
+}
+</style>

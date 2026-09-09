@@ -28,7 +28,7 @@ defineOptions({
 
 import { useClipboard } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
-import { isObject, isString } from 'lodash-es';
+import { isObject, isString, isEmpty } from 'lodash-es';
 import { computed, defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -58,6 +58,8 @@ const text = computed(() => {
 		return v;
 	} else if (isObject(v)) {
 		return JSON.stringify(v, null, 4);
+	} else if (isEmpty(v)) {
+		return '';
 	} else {
 		return String(v);
 	}

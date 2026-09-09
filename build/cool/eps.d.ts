@@ -2152,19 +2152,29 @@ declare namespace Eps {
 
 	interface TianqinData {
 		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+
+		/**
 		 * 分页查询
 		 */
 		page(data?: any): Promise<TianqinDataPageResponse>;
 
 		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<TianqinDataEntity>;
+
+		/**
 		 * 权限标识
 		 */
-		permission: { page: string };
+		permission: { update: string; page: string; info: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { page: boolean };
+		_permission: { update: boolean; page: boolean; info: boolean };
 
 		request: Request;
 	}
