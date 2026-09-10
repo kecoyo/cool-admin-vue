@@ -37,7 +37,6 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
-import { ElMessage } from 'element-plus';
 
 const { service } = useCool();
 const { t } = useI18n();
@@ -45,34 +44,16 @@ const { t } = useI18n();
 // 选项
 const options = reactive({
 	trend: [
-		{
-			label: '多头',
-			value: '多头'
-		},
-		{
-			label: '空头',
-			value: '空头'
-		}
+		{ label: '多头', value: '多头' },
+		{ label: '空头', value: '空头' }
 	],
 	band: [
-		{
-			label: '主要趋势',
-			value: '主要趋势'
-		},
-		{
-			label: '次级折返',
-			value: '次级折返'
-		}
+		{ label: '主要趋势', value: '主要趋势' },
+		{ label: '次级折返', value: '次级折返' }
 	],
 	status: [
-		{
-			label: '启用',
-			value: 1
-		},
-		{
-			label: '禁用',
-			value: 0
-		}
+		{ label: '启用', value: 1 },
+		{ label: '禁用', value: 0 }
 	]
 });
 
@@ -155,16 +136,8 @@ const Table = useTable({
 			prop: 'trend',
 			minWidth: 100,
 			dict: [
-				{
-					label: '多头',
-					value: '多头',
-					type: 'danger'
-				},
-				{
-					label: '空头',
-					value: '空头',
-					type: 'success'
-				}
+				{ label: '多头', value: '多头', type: 'danger' },
+				{ label: '空头', value: '空头', type: 'success' }
 			]
 		},
 		{
@@ -172,16 +145,8 @@ const Table = useTable({
 			prop: 'band',
 			minWidth: 100,
 			dict: [
-				{
-					label: '主要趋势',
-					value: '主要趋势',
-					type: 'primary'
-				},
-				{
-					label: '次级折返',
-					value: '次级折返',
-					type: 'warning'
-				}
+				{ label: '主要趋势', value: '主要趋势', type: 'primary' },
+				{ label: '次级折返', value: '次级折返', type: 'warning' }
 			]
 		},
 		{
@@ -189,49 +154,38 @@ const Table = useTable({
 			prop: 'kdjSignal',
 			minWidth: 100,
 			dict: [
-				{
-					label: '金叉',
-					value: '金叉',
-					type: 'danger'
-				},
-				{
-					label: '死叉',
-					value: '死叉',
-					type: 'success'
-				}
-			]
+				{ label: '金叉', value: '金叉', type: 'danger' },
+				{ label: '死叉', value: '死叉', type: 'success' }
+			],
+			sortable: 'desc'
 		},
 		{
 			label: 'KDJ值',
 			prop: 'kdjValue',
-			minWidth: 100
+			minWidth: 100,
+			sortable: 'desc'
 		},
 		{
 			label: 'CCI值',
 			prop: 'cciValue',
-			minWidth: 100
+			minWidth: 100,
+			sortable: 'desc'
 		},
 		{
 			label: '小时趋势方向',
 			prop: 'hourTrend',
 			minWidth: 100,
 			dict: [
-				{
-					label: '多头',
-					value: '多头',
-					type: 'danger'
-				},
-				{
-					label: '空头',
-					value: '空头',
-					type: 'success'
-				}
-			]
+				{ label: '多头', value: '多头', type: 'danger' },
+				{ label: '空头', value: '空头', type: 'success' }
+			],
+			sortable: 'desc'
 		},
 		{
 			label: '小时CCI值',
 			prop: 'hourCciValue',
-			minWidth: 100
+			minWidth: 100,
+			sortable: 'desc'
 		},
 		{
 			label: t('备注'),
@@ -265,7 +219,10 @@ const Upsert = useUpsert({
 			span: 12,
 			required: true,
 			component: {
-				name: 'el-input'
+				name: 'el-input',
+				props: {
+					disabled: true
+				}
 			}
 		},
 		{
@@ -274,7 +231,10 @@ const Upsert = useUpsert({
 			span: 12,
 			required: true,
 			component: {
-				name: 'el-input'
+				name: 'el-input',
+				props: {
+					disabled: true
+				}
 			}
 		},
 		{
@@ -284,7 +244,7 @@ const Upsert = useUpsert({
 				name: 'el-input',
 				props: {
 					placeholder: t('请输入备注'),
-					rows: 3,
+					rows: 10,
 					type: 'textarea'
 				}
 			}
