@@ -2157,24 +2157,29 @@ declare namespace Eps {
 		update(data?: any): Promise<any>;
 
 		/**
-		 * 分页查询
-		 */
-		page(data?: any): Promise<TianqinDataPageResponse>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<TianqinDataEntity>;
 
 		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<TianqinDataEntity[]>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<TianqinDataPageResponse>;
+
+		/**
 		 * 权限标识
 		 */
-		permission: { update: string; page: string; info: string };
+		permission: { update: string; info: string; list: string; page: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { update: boolean; page: boolean; info: boolean };
+		_permission: { update: boolean; info: boolean; list: boolean; page: boolean };
 
 		request: Request;
 	}
