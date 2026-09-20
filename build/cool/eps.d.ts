@@ -934,6 +934,83 @@ declare namespace Eps {
 		[key: string]: any;
 	}
 
+	interface TianqinTrendEntity {
+		/**
+		 * ID
+		 */
+		id?: number;
+
+		/**
+		 * 品种代码
+		 */
+		code?: string;
+
+		/**
+		 * 品种名称
+		 */
+		name?: string;
+
+		/**
+		 * 备注
+		 */
+		remark?: string;
+
+		/**
+		 * 状态
+		 */
+		status?: number;
+
+		/**
+		 * 主力合约
+		 */
+		mainSymbol?: string;
+
+		/**
+		 * 当前价格
+		 */
+		price?: number;
+
+		/**
+		 * 趋势方向
+		 */
+		trendDirection?: string;
+
+		/**
+		 * 当前状态
+		 */
+		trendState?: string;
+
+		/**
+		 * 趋势强度
+		 */
+		trendStrength?: number;
+
+		/**
+		 * 操作建议
+		 */
+		action?: string;
+
+		/**
+		 * 操作详情
+		 */
+		actionDetail?: string;
+
+		/**
+		 * 创建时间
+		 */
+		createTime?: string;
+
+		/**
+		 * 更新时间
+		 */
+		updateTime?: string;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
 	interface UserAddressEntity {
 		/**
 		 * ID
@@ -1146,6 +1223,11 @@ declare namespace Eps {
 	interface TianqinDataPageResponse {
 		pagination: PagePagination;
 		list: TianqinDataEntity[];
+	}
+
+	interface TianqinTrendPageResponse {
+		pagination: PagePagination;
+		list: TianqinTrendEntity[];
 	}
 
 	interface UserAddressPageResponse {
@@ -2184,6 +2266,40 @@ declare namespace Eps {
 		request: Request;
 	}
 
+	interface TianqinTrend {
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<TianqinTrendEntity>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<TianqinTrendEntity[]>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<TianqinTrendPageResponse>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { update: string; info: string; list: string; page: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: { update: boolean; info: boolean; list: boolean; page: boolean };
+
+		request: Request;
+	}
+
 	interface UserAddress {
 		/**
 		 * 删除
@@ -2336,7 +2452,7 @@ declare namespace Eps {
 		recycle: { data: RecycleData };
 		space: { info: SpaceInfo; type: SpaceType };
 		task: { info: TaskInfo };
-		tianqin: { data: TianqinData };
+		tianqin: { data: TianqinData; trend: TianqinTrend };
 		user: { address: UserAddress; info: UserInfo };
 	};
 }
