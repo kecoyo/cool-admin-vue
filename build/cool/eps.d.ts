@@ -2244,6 +2244,11 @@ declare namespace Eps {
 
 	interface TianqinData {
 		/**
+		 * 启动任务
+		 */
+		startTask(data?: any): Promise<any>;
+
+		/**
 		 * 修改
 		 */
 		update(data?: any): Promise<any>;
@@ -2266,17 +2271,28 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { update: string; info: string; list: string; page: string };
+		permission: { startTask: string; update: string; info: string; list: string; page: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { update: boolean; info: boolean; list: boolean; page: boolean };
+		_permission: {
+			startTask: boolean;
+			update: boolean;
+			info: boolean;
+			list: boolean;
+			page: boolean;
+		};
 
 		request: Request;
 	}
 
 	interface TianqinTrend {
+		/**
+		 * 启动任务
+		 */
+		startTask(data?: any): Promise<any>;
+
 		/**
 		 * 导出策略文件
 		 */
@@ -2305,12 +2321,20 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { export: string; update: string; info: string; list: string; page: string };
+		permission: {
+			startTask: string;
+			export: string;
+			update: string;
+			info: string;
+			list: string;
+			page: string;
+		};
 
 		/**
 		 * 权限状态
 		 */
 		_permission: {
+			startTask: boolean;
 			export: boolean;
 			update: boolean;
 			info: boolean;

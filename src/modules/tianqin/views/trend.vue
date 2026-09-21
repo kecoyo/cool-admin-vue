@@ -2,6 +2,10 @@
 	<cl-crud ref="Crud">
 		<cl-row>
 			<cl-refresh-btn />
+			<el-button type="warning" :loading="tasking" @click="onStartTask">
+				<cl-svg name="icon-task" class="mr-[5px]" />
+				{{ $t('启动更新任务') }}
+			</el-button>
 			<el-button type="success" :loading="exporting" @click="onExport">
 				<cl-svg name="export" class="mr-[5px]" />
 				{{ $t('导出') }}
@@ -148,6 +152,29 @@ async function onExport() {
 		}
 	} finally {
 		exporting.value = false;
+	}
+}
+
+// 启动更新任务
+const tasking = ref(false);
+
+async function onStartTask() {
+	if (tasking.value) return;
+
+	tasking.value = true;
+
+	try {
+		const res = await service.tianqin.trend.request({
+			url: '/startTask',
+			method: 'POST'
+		});
+		console.log(res);
+
+		ElMessage.success(res?.message || t('任务已启动'));
+	} catch (err: any) {
+		ElMessage.error(err?.message || t('启动失败'));
+	} finally {
+		tasking.value = false;
 	}
 }
 

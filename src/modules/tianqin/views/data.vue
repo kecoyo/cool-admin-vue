@@ -2,6 +2,10 @@
 	<cl-crud ref="Crud">
 		<cl-row>
 			<cl-refresh-btn />
+			<el-button type="warning" :loading="tasking" @click="onStartTask">
+				<cl-svg name="icon-task" class="mr-[5px]" />
+				{{ $t('启动更新任务') }}
+			</el-button>
 			<cl-flex1 />
 			<cl-filter :label="$t('趋势方向')">
 				<cl-select v-model="trend" :options="options.trend" prop="trend" :width="120" />
@@ -37,6 +41,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
+import { ElMessage } from 'element-plus';
 
 const { service } = useCool();
 const { t } = useI18n();
@@ -61,6 +66,29 @@ const options = reactive({
 const trend = ref('多头');
 const band = ref('次级折返');
 const status = ref(1);
+
+// 启动更新任务
+const tasking = ref(false);
+
+async function onStartTask() {
+	if (tasking.value) return;
+
+	tasking.value = true;
+
+	try {
+		const res = await service.tianqin.data.request({
+			url: '/startTask',
+			method: 'POST'
+		});
+		console.log(res);
+
+		ElMessage.success(res?.message || t('任务已启动'));
+	} catch (err: any) {
+		ElMessage.error(err?.message || t('启动失败'));
+	} finally {
+		tasking.value = false;
+	}
+}
 
 // cl-crud
 const Crud = useCrud(
