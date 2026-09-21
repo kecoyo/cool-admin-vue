@@ -961,9 +961,19 @@ declare namespace Eps {
 		status?: number;
 
 		/**
-		 * 主力合约
+		 * 主力合约代码
 		 */
 		mainSymbol?: string;
+
+		/**
+		 * 主力合约代码（不含交易所代码）
+		 */
+		contractCode?: string;
+
+		/**
+		 * 主力合约名称
+		 */
+		contractName?: string;
 
 		/**
 		 * 当前价格
@@ -2268,6 +2278,11 @@ declare namespace Eps {
 
 	interface TianqinTrend {
 		/**
+		 * 导出策略文件
+		 */
+		export(data?: any): Promise<any>;
+
+		/**
 		 * 修改
 		 */
 		update(data?: any): Promise<any>;
@@ -2290,12 +2305,18 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { update: string; info: string; list: string; page: string };
+		permission: { export: string; update: string; info: string; list: string; page: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { update: boolean; info: boolean; list: boolean; page: boolean };
+		_permission: {
+			export: boolean;
+			update: boolean;
+			info: boolean;
+			list: boolean;
+			page: boolean;
+		};
 
 		request: Request;
 	}

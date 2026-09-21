@@ -2,6 +2,10 @@
 	<cl-crud ref="Crud">
 		<cl-row>
 			<cl-refresh-btn />
+			<el-button type="success" :loading="exporting" @click="onExport">
+				<cl-svg name="export" class="mr-[5px]" />
+				{{ $t('导出') }}
+			</el-button>
 			<cl-flex1 />
 			<cl-filter :label="$t('趋势方向')">
 				<cl-select
@@ -47,6 +51,8 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
+import { ElMessage } from 'element-plus';
+import dayjs from 'dayjs';
 
 const { service } = useCool();
 const { t } = useI18n();
@@ -82,6 +88,68 @@ const options = reactive({
 const trendDirection = ref('');
 const trendState = ref('主趋势');
 const status = ref(1);
+
+// 导出
+const exporting = ref(false);
+
+async function onExport() {
+	if (exporting.value) return;
+
+	exporting.value = true;
+
+	try {
+		// 获取列表当前的过滤参数（含分页、搜索关键字、筛选条件、排序等）
+		const params = Crud.value?.getParams() || {};
+
+		const res = await service.tianqin.trend.request({
+			url: '/export',
+			method: 'POST',
+			responseType: 'blob',
+			data: {
+				trendDirection: trendDirection.value,
+				trendState: trendState.value,
+				status: status.value
+			}
+		});
+
+		// 从响应头获取文件名
+		const disposition = (res as any)?.headers?.['content-disposition'] || '';
+		let filename = `趋势数据 ${dayjs().format('YYYY-MM-DD HH_mm_ss')}.zip`;
+
+		if (disposition) {
+			const match = disposition.match(/filename\*?=(?:UTF-8'')?(["']?)([^;"'\n]+)\1/i);
+			if (match) {
+				filename = decodeURIComponent(match[2]);
+			}
+		}
+
+		// 创建下载链接
+		const blob = res instanceof Blob ? res : new Blob([res as any]);
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		a.click();
+		URL.revokeObjectURL(url);
+
+		ElMessage.success(t('导出成功'));
+	} catch (err: any) {
+		// 处理blob类型的错误响应
+		if (err instanceof Blob) {
+			const text = await err.text();
+			try {
+				const json = JSON.parse(text);
+				ElMessage.error(json.message || t('导出失败'));
+			} catch {
+				ElMessage.error(t('导出失败'));
+			}
+		} else {
+			ElMessage.error(err?.message || t('导出失败'));
+		}
+	} finally {
+		exporting.value = false;
+	}
+}
 
 // cl-crud
 const Crud = useCrud(
@@ -134,12 +202,12 @@ const Table = useTable({
 		},
 		{
 			label: t('合约代码'),
-			prop: 'mainSymbol',
+			prop: 'contractCode',
 			minWidth: 120
 		},
 		{
 			label: t('合约名称'),
-			prop: 'name',
+			prop: 'contractName',
 			minWidth: 100
 		},
 		{
@@ -156,7 +224,7 @@ const Table = useTable({
 			label: '趋势方向',
 			prop: 'trendDirection',
 			minWidth: 100,
-			sortable: 'desc',
+			sortable: 'asc',
 			dict: [
 				{ label: '上涨趋势', value: '上涨趋势', type: 'danger' },
 				{ label: '下跌趋势', value: '下跌趋势', type: 'success' },
