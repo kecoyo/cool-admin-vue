@@ -320,8 +320,8 @@ const Upsert = useUpsert({
 
 	items: [
 		{
-			prop: 'code',
-			label: '代码',
+			prop: 'contractCode',
+			label: '合约代码',
 			span: 12,
 			required: true,
 			component: {
@@ -332,8 +332,8 @@ const Upsert = useUpsert({
 			}
 		},
 		{
-			prop: 'name',
-			label: t('名称'),
+			prop: 'contractName',
+			label: t('合约名称'),
 			span: 12,
 			required: true,
 			component: {

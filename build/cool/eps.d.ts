@@ -854,19 +854,19 @@ declare namespace Eps {
 		id?: number;
 
 		/**
+		 * 交易所
+		 */
+		exchangeId?: string;
+
+		/**
 		 * 品种代码
 		 */
-		code?: string;
+		productId?: string;
 
 		/**
 		 * 品种名称
 		 */
-		name?: string;
-
-		/**
-		 * 备注
-		 */
-		remark?: string;
+		productName?: string;
 
 		/**
 		 * 状态
@@ -874,9 +874,24 @@ declare namespace Eps {
 		status?: number;
 
 		/**
-		 * 主力合约
+		 * 备注
+		 */
+		remark?: string;
+
+		/**
+		 * 主力合约代码
 		 */
 		mainSymbol?: string;
+
+		/**
+		 * 主力合约代码（不含交易所代码）
+		 */
+		contractCode?: string;
+
+		/**
+		 * 主力合约名称
+		 */
+		contractName?: string;
 
 		/**
 		 * 当前价格
@@ -941,24 +956,29 @@ declare namespace Eps {
 		id?: number;
 
 		/**
+		 * 交易所
+		 */
+		exchangeId?: string;
+
+		/**
 		 * 品种代码
 		 */
-		code?: string;
+		productId?: string;
 
 		/**
 		 * 品种名称
 		 */
-		name?: string;
-
-		/**
-		 * 备注
-		 */
-		remark?: string;
+		productName?: string;
 
 		/**
 		 * 状态
 		 */
 		status?: number;
+
+		/**
+		 * 备注
+		 */
+		remark?: string;
 
 		/**
 		 * 主力合约代码

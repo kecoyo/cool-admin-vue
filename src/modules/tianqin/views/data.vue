@@ -141,12 +141,12 @@ const Table = useTable({
 		},
 		{
 			label: t('合约代码'),
-			prop: 'mainSymbol',
+			prop: 'contractCode',
 			minWidth: 120
 		},
 		{
 			label: t('合约名称'),
-			prop: 'name',
+			prop: 'contractName',
 			minWidth: 100
 		},
 		{
@@ -242,8 +242,8 @@ const Upsert = useUpsert({
 
 	items: [
 		{
-			prop: 'code',
-			label: '代码',
+			prop: 'contractCode',
+			label: '合约代码',
 			span: 12,
 			required: true,
 			component: {
@@ -254,8 +254,8 @@ const Upsert = useUpsert({
 			}
 		},
 		{
-			prop: 'name',
-			label: t('名称'),
+			prop: 'contractName',
+			label: t('合约名称'),
 			span: 12,
 			required: true,
 			component: {
