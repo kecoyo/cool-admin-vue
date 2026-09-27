@@ -854,19 +854,14 @@ declare namespace Eps {
 		id?: number;
 
 		/**
-		 * 交易所
-		 */
-		exchangeId?: string;
-
-		/**
 		 * 品种代码
 		 */
-		productId?: string;
+		code?: string;
 
 		/**
 		 * 品种名称
 		 */
-		productName?: string;
+		name?: string;
 
 		/**
 		 * 状态
@@ -956,19 +951,14 @@ declare namespace Eps {
 		id?: number;
 
 		/**
-		 * 交易所
-		 */
-		exchangeId?: string;
-
-		/**
 		 * 品种代码
 		 */
-		productId?: string;
+		code?: string;
 
 		/**
 		 * 品种名称
 		 */
-		productName?: string;
+		name?: string;
 
 		/**
 		 * 状态
