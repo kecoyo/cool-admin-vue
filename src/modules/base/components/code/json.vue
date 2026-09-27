@@ -44,7 +44,8 @@ const props = defineProps({
 		type: [Number, String],
 		default: 300
 	},
-	title: String
+	title: String,
+	showCopy: Boolean
 });
 
 const { copy } = useClipboard();
@@ -77,7 +78,7 @@ const viewer = defineComponent({
 			return (
 				<div class="cl-code-json">
 					<div class="cl-code-json__op">
-						{text.value != '{}' && (
+						{props.showCopy && text.value != '{}' && (
 							<el-button type="success" size="small" onClick={toCopy}>
 								{t('复制')}
 							</el-button>
