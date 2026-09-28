@@ -8,10 +8,20 @@
 			</el-button>
 			<cl-flex1 />
 			<cl-filter :label="$t('趋势方向')">
-				<cl-select v-model="trend" :options="options.trend" prop="trend" :width="120" />
+				<cl-select
+					v-model="dayTrendDirection"
+					:options="options.trendDirection"
+					prop="dayTrendDirection"
+					:width="120"
+				/>
 			</cl-filter>
 			<cl-filter :label="$t('当前运行')">
-				<cl-select v-model="band" :options="options.band" prop="band" :width="120" />
+				<cl-select
+					v-model="dayTrendState"
+					:options="options.trendState"
+					prop="dayTrendState"
+					:width="120"
+				/>
 			</cl-filter>
 			<cl-filter :label="$t('状态')">
 				<cl-select v-model="status" :options="options.status" prop="status" :width="120" />
@@ -48,12 +58,12 @@ const { t } = useI18n();
 
 // 选项
 const options = reactive({
-	trend: [
+	trendDirection: [
 		{ label: '多头', value: '多头' },
 		{ label: '空头', value: '空头' }
 	],
-	band: [
-		{ label: '主要趋势', value: '主要趋势' },
+	trendState: [
+		{ label: '主趋势', value: '主趋势' },
 		{ label: '次级折返', value: '次级折返' }
 	],
 	status: [
@@ -63,8 +73,8 @@ const options = reactive({
 });
 
 // 参数
-const trend = ref('多头');
-const band = ref('次级折返');
+const dayTrendDirection = ref('多头');
+const dayTrendState = ref('次级折返');
 const status = ref(1);
 
 // 启动更新任务
@@ -97,8 +107,8 @@ const Crud = useCrud(
 		onRefresh(params, { next }) {
 			next({
 				...params,
-				trend: trend.value,
-				band: band.value,
+				dayTrendDirection: dayTrendDirection.value,
+				dayTrendState: dayTrendState.value,
 				status: status.value
 			});
 		}
@@ -137,17 +147,20 @@ const Table = useTable({
 		{
 			type: 'index',
 			label: '#',
-			width: 60
+			width: 60,
+			fixed: true
 		},
 		{
 			label: t('合约代码'),
 			prop: 'contractCode',
-			minWidth: 120
+			minWidth: 120,
+			fixed: true
 		},
 		{
 			label: t('合约名称'),
 			prop: 'contractName',
-			minWidth: 100
+			minWidth: 100,
+			fixed: true
 		},
 		{
 			label: t('更新时间'),
@@ -161,7 +174,7 @@ const Table = useTable({
 		},
 		{
 			label: '趋势方向',
-			prop: 'trend',
+			prop: 'dayTrendDirection',
 			minWidth: 100,
 			dict: [
 				{ label: '多头', value: '多头', type: 'danger' },
@@ -169,17 +182,17 @@ const Table = useTable({
 			]
 		},
 		{
-			label: '当前运行',
-			prop: 'band',
+			label: '当前状态',
+			prop: 'dayTrendState',
 			minWidth: 100,
 			dict: [
-				{ label: '主要趋势', value: '主要趋势', type: 'primary' },
+				{ label: '主趋势', value: '主趋势', type: 'primary' },
 				{ label: '次级折返', value: '次级折返', type: 'warning' }
 			]
 		},
 		{
 			label: 'KDJ信号',
-			prop: 'kdjSignal',
+			prop: 'dayKdjSignal',
 			minWidth: 100,
 			dict: [
 				{ label: '金叉', value: '金叉', type: 'danger' },
@@ -189,20 +202,14 @@ const Table = useTable({
 		},
 		{
 			label: 'KDJ值',
-			prop: 'kdjValue',
-			minWidth: 100,
-			sortable: 'desc'
-		},
-		{
-			label: 'CCI值',
-			prop: 'cciValue',
+			prop: 'dayKdjValue',
 			minWidth: 100,
 			sortable: 'desc'
 		},
 		{
 			label: '小时趋势方向',
-			prop: 'hourTrend',
-			minWidth: 100,
+			prop: 'hourTrendDirection',
+			minWidth: 120,
 			dict: [
 				{ label: '多头', value: '多头', type: 'danger' },
 				{ label: '空头', value: '空头', type: 'success' }
@@ -212,8 +219,60 @@ const Table = useTable({
 		{
 			label: '小时CCI值',
 			prop: 'hourCciValue',
-			minWidth: 100,
+			minWidth: 120,
 			sortable: 'desc'
+		},
+		{
+			label: '周线趋势方向',
+			prop: 'weekTrendDirection',
+			minWidth: 120,
+			dict: [
+				{ label: '多头', value: '多头', type: 'danger' },
+				{ label: '空头', value: '空头', type: 'success' }
+			]
+		},
+		{
+			label: '周线当前状态',
+			prop: 'weekTrendState',
+			minWidth: 120,
+			dict: [
+				{ label: '主趋势', value: '主趋势', type: 'primary' },
+				{ label: '次级折返', value: '次级折返', type: 'warning' }
+			]
+		},
+		{
+			label: '周线KDJ信号',
+			prop: 'weekKdjSignal',
+			minWidth: 120,
+			dict: [
+				{ label: '金叉', value: '金叉', type: 'danger' },
+				{ label: '死叉', value: '死叉', type: 'success' }
+			],
+			sortable: 'desc'
+		},
+		{
+			label: '周线KDJ值',
+			prop: 'weekKdjValue',
+			minWidth: 120,
+			sortable: 'desc'
+		},
+		{
+			label: '周线多空趋势',
+			prop: 'weekLongShortTrend',
+			minWidth: 120,
+			dict: [
+				{ label: '多头', value: '多头', type: 'danger' },
+				{ label: '空头', value: '空头', type: 'success' }
+			]
+		},
+		{
+			label: '周线多空状态',
+			prop: 'weekLongShortState',
+			minWidth: 120,
+			dict: [
+				{ label: '多头', value: '多头', type: 'danger' },
+				{ label: '空头', value: '空头', type: 'success' }
+			]
 		},
 		{
 			label: t('备注'),

@@ -896,37 +896,67 @@ declare namespace Eps {
 		/**
 		 * 趋势方向
 		 */
-		trend?: string;
+		dayTrendDirection?: string;
 
 		/**
-		 * 当前运行
+		 * 当前状态
 		 */
-		band?: string;
+		dayTrendState?: string;
 
 		/**
 		 * KDJ信号
 		 */
-		kdjSignal?: string;
+		dayKdjSignal?: string;
 
 		/**
 		 * KDJ值
 		 */
-		kdjValue?: number;
+		dayKdjValue?: number;
 
 		/**
 		 * CCI值
 		 */
-		cciValue?: number;
+		dayCciValue?: number;
 
 		/**
 		 * 小时趋势方向
 		 */
-		hourTrend?: string;
+		hourTrendDirection?: string;
 
 		/**
 		 * 小时CCI值
 		 */
 		hourCciValue?: number;
+
+		/**
+		 * 周线趋势方向
+		 */
+		weekTrendDirection?: string;
+
+		/**
+		 * 周线当前状态
+		 */
+		weekTrendState?: string;
+
+		/**
+		 * 周线KDJ信号
+		 */
+		weekKdjSignal?: string;
+
+		/**
+		 * 周线KDJ值
+		 */
+		weekKdjValue?: number;
+
+		/**
+		 * 周线多空趋势
+		 */
+		weekLongShortTrend?: string;
+
+		/**
+		 * 周线多空状态
+		 */
+		weekLongShortState?: string;
 
 		/**
 		 * 创建时间
