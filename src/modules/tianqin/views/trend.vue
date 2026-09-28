@@ -51,12 +51,13 @@ defineOptions({
 	name: 'tianqin-trend'
 });
 
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, nextTick } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
 import { ElMessage } from 'element-plus';
 import dayjs from 'dayjs';
+import { statusOptions, useStartTask, useAutoRefresh, useFilterCache } from '../utils';
 
 const { service } = useCool();
 const { t } = useI18n();
@@ -82,10 +83,7 @@ const options = reactive({
 		{ label: '震荡偏下', value: '震荡偏下' },
 		{ label: '震荡中位', value: '震荡中位' }
 	],
-	status: [
-		{ label: '启用', value: 1 },
-		{ label: '禁用', value: 0 }
-	]
+	status: statusOptions
 });
 
 // 参数
@@ -156,27 +154,9 @@ async function onExport() {
 }
 
 // 启动更新任务
-const tasking = ref(false);
-
-async function onStartTask() {
-	if (tasking.value) return;
-
-	tasking.value = true;
-
-	try {
-		const res = await service.tianqin.trend.request({
-			url: '/startTask',
-			method: 'POST'
-		});
-		console.log(res);
-
-		ElMessage.success(res?.message || t('任务已启动'));
-	} catch (err: any) {
-		ElMessage.error(err?.message || t('启动失败'));
-	} finally {
-		tasking.value = false;
-	}
-}
+const { tasking, onStartTask } = useStartTask(() =>
+	service.tianqin.trend.request({ url: '/startTask', method: 'POST' })
+);
 
 // cl-crud
 const Crud = useCrud(
@@ -190,33 +170,24 @@ const Crud = useCrud(
 				status: status.value
 			});
 		}
+	}
+);
+
+// 筛选条件缓存：进入页面时先恢复缓存条件，再加载列表数据
+useFilterCache(
+	'trend',
+	{
+		trendDirection,
+		trendState,
+		status
 	},
-	app => {
-		// 加载表格数据
-		app.refresh({
-			size: 100
-		});
+	() => {
+		nextTick(() => Crud.value?.refresh({ size: 100 }));
 	}
 );
 
 // 自动刷新（每5分钟）
-let refreshTimer: ReturnType<typeof setInterval> | null = null;
-
-onMounted(() => {
-	refreshTimer = setInterval(
-		() => {
-			Crud.value?.refresh();
-		},
-		5 * 60 * 1000
-	);
-});
-
-onUnmounted(() => {
-	if (refreshTimer) {
-		clearInterval(refreshTimer);
-		refreshTimer = null;
-	}
-});
+useAutoRefresh(() => Crud.value?.refresh());
 
 // cl-table
 const Table = useTable({

@@ -7,7 +7,23 @@
 				{{ $t('启动更新任务') }}
 			</el-button>
 			<cl-flex1 />
-			<cl-filter :label="$t('趋势方向')">
+			<cl-filter :label="$t('周趋势')">
+				<cl-select
+					v-model="weekTrendDirection"
+					:options="options.trendDirection"
+					prop="weekTrendDirection"
+					:width="120"
+				/>
+			</cl-filter>
+			<cl-filter :label="$t('周状态')">
+				<cl-select
+					v-model="weekTrendState"
+					:options="options.trendState"
+					prop="weekTrendState"
+					:width="120"
+				/>
+			</cl-filter>
+			<cl-filter :label="$t('日趋势')">
 				<cl-select
 					v-model="dayTrendDirection"
 					:options="options.trendDirection"
@@ -15,11 +31,19 @@
 					:width="120"
 				/>
 			</cl-filter>
-			<cl-filter :label="$t('当前运行')">
+			<cl-filter :label="$t('日状态')">
 				<cl-select
 					v-model="dayTrendState"
 					:options="options.trendState"
 					prop="dayTrendState"
+					:width="120"
+				/>
+			</cl-filter>
+			<cl-filter :label="$t('小时趋势')">
+				<cl-select
+					v-model="hourTrendDirection"
+					:options="options.trendDirection"
+					prop="hourTrendDirection"
 					:width="120"
 				/>
 			</cl-filter>
@@ -47,58 +71,41 @@ defineOptions({
 	name: 'tianqin-data'
 });
 
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, nextTick } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
-import { ElMessage } from 'element-plus';
+import {
+	statusOptions,
+	longShortDict,
+	kdjSignalDict,
+	useStartTask,
+	useAutoRefresh,
+	useFilterCache
+} from '../utils';
 
 const { service } = useCool();
 const { t } = useI18n();
 
 // 选项
 const options = reactive({
-	trendDirection: [
-		{ label: '多头', value: '多头' },
-		{ label: '空头', value: '空头' }
-	],
-	trendState: [
-		{ label: '主趋势', value: '主趋势' },
-		{ label: '次级折返', value: '次级折返' }
-	],
-	status: [
-		{ label: '启用', value: 1 },
-		{ label: '禁用', value: 0 }
-	]
+	trendDirection: longShortDict.map(({ type, ...rest }) => rest),
+	trendState: longShortDict.map(({ type, ...rest }) => rest),
+	status: statusOptions
 });
 
 // 参数
+const weekTrendDirection = ref('');
+const weekTrendState = ref('多头');
 const dayTrendDirection = ref('多头');
-const dayTrendState = ref('次级折返');
+const dayTrendState = ref('');
+const hourTrendDirection = ref('多头');
 const status = ref(1);
 
 // 启动更新任务
-const tasking = ref(false);
-
-async function onStartTask() {
-	if (tasking.value) return;
-
-	tasking.value = true;
-
-	try {
-		const res = await service.tianqin.data.request({
-			url: '/startTask',
-			method: 'POST'
-		});
-		console.log(res);
-
-		ElMessage.success(res?.message || t('任务已启动'));
-	} catch (err: any) {
-		ElMessage.error(err?.message || t('启动失败'));
-	} finally {
-		tasking.value = false;
-	}
-}
+const { tasking, onStartTask } = useStartTask(() =>
+	service.tianqin.data.request({ url: '/startTask', method: 'POST' })
+);
 
 // cl-crud
 const Crud = useCrud(
@@ -107,38 +114,35 @@ const Crud = useCrud(
 		onRefresh(params, { next }) {
 			next({
 				...params,
+				weekTrendDirection: weekTrendDirection.value,
+				weekTrendState: weekTrendState.value,
 				dayTrendDirection: dayTrendDirection.value,
 				dayTrendState: dayTrendState.value,
+				hourTrendDirection: hourTrendDirection.value,
 				status: status.value
 			});
 		}
+	}
+);
+
+// 筛选条件缓存：进入页面时先恢复缓存条件，再加载列表数据
+useFilterCache(
+	'data',
+	{
+		weekTrendDirection,
+		weekTrendState,
+		dayTrendDirection,
+		dayTrendState,
+		hourTrendDirection,
+		status
 	},
-	app => {
-		// 加载表格数据
-		app.refresh({
-			size: 100
-		});
+	() => {
+		nextTick(() => Crud.value?.refresh({ size: 100 }));
 	}
 );
 
 // 自动刷新（每5分钟）
-let refreshTimer: ReturnType<typeof setInterval> | null = null;
-
-onMounted(() => {
-	refreshTimer = setInterval(
-		() => {
-			Crud.value?.refresh();
-		},
-		5 * 60 * 1000
-	);
-});
-
-onUnmounted(() => {
-	if (refreshTimer) {
-		clearInterval(refreshTimer);
-		refreshTimer = null;
-	}
-});
+useAutoRefresh(() => Crud.value?.refresh());
 
 // cl-table
 const Table = useTable({
@@ -173,106 +177,45 @@ const Table = useTable({
 			minWidth: 100
 		},
 		{
-			label: '趋势方向',
+			label: '周趋势',
+			prop: 'weekTrendDirection',
+			minWidth: 100,
+			dict: longShortDict,
+			sortable: 'desc'
+		},
+		{
+			label: '周状态',
+			prop: 'weekTrendState',
+			minWidth: 100,
+			dict: longShortDict,
+			sortable: 'desc'
+		},
+		{
+			label: '日趋势',
 			prop: 'dayTrendDirection',
 			minWidth: 100,
-			dict: [
-				{ label: '多头', value: '多头', type: 'danger' },
-				{ label: '空头', value: '空头', type: 'success' }
-			]
+			dict: longShortDict,
+			sortable: 'desc'
 		},
 		{
-			label: '当前状态',
+			label: '日状态',
 			prop: 'dayTrendState',
 			minWidth: 100,
-			dict: [
-				{ label: '主趋势', value: '主趋势', type: 'primary' },
-				{ label: '次级折返', value: '次级折返', type: 'warning' }
-			]
-		},
-		{
-			label: 'KDJ信号',
-			prop: 'dayKdjSignal',
-			minWidth: 100,
-			dict: [
-				{ label: '金叉', value: '金叉', type: 'danger' },
-				{ label: '死叉', value: '死叉', type: 'success' }
-			],
+			dict: longShortDict,
 			sortable: 'desc'
 		},
 		{
-			label: 'KDJ值',
-			prop: 'dayKdjValue',
-			minWidth: 100,
-			sortable: 'desc'
-		},
-		{
-			label: '小时趋势方向',
+			label: '小时趋势',
 			prop: 'hourTrendDirection',
-			minWidth: 120,
-			dict: [
-				{ label: '多头', value: '多头', type: 'danger' },
-				{ label: '空头', value: '空头', type: 'success' }
-			],
+			minWidth: 100,
+			dict: longShortDict,
 			sortable: 'desc'
 		},
 		{
-			label: '小时CCI值',
+			label: '小时CCI',
 			prop: 'hourCciValue',
 			minWidth: 120,
 			sortable: 'desc'
-		},
-		{
-			label: '周线趋势方向',
-			prop: 'weekTrendDirection',
-			minWidth: 120,
-			dict: [
-				{ label: '多头', value: '多头', type: 'danger' },
-				{ label: '空头', value: '空头', type: 'success' }
-			]
-		},
-		{
-			label: '周线当前状态',
-			prop: 'weekTrendState',
-			minWidth: 120,
-			dict: [
-				{ label: '主趋势', value: '主趋势', type: 'primary' },
-				{ label: '次级折返', value: '次级折返', type: 'warning' }
-			]
-		},
-		{
-			label: '周线KDJ信号',
-			prop: 'weekKdjSignal',
-			minWidth: 120,
-			dict: [
-				{ label: '金叉', value: '金叉', type: 'danger' },
-				{ label: '死叉', value: '死叉', type: 'success' }
-			],
-			sortable: 'desc'
-		},
-		{
-			label: '周线KDJ值',
-			prop: 'weekKdjValue',
-			minWidth: 120,
-			sortable: 'desc'
-		},
-		{
-			label: '周线多空趋势',
-			prop: 'weekLongShortTrend',
-			minWidth: 120,
-			dict: [
-				{ label: '多头', value: '多头', type: 'danger' },
-				{ label: '空头', value: '空头', type: 'success' }
-			]
-		},
-		{
-			label: '周线多空状态',
-			prop: 'weekLongShortState',
-			minWidth: 120,
-			dict: [
-				{ label: '多头', value: '多头', type: 'danger' },
-				{ label: '空头', value: '空头', type: 'success' }
-			]
 		},
 		{
 			label: t('备注'),
@@ -284,6 +227,32 @@ const Table = useTable({
 					popover: true
 				}
 			}
+		},
+		{
+			label: '周KDJ信号',
+			prop: 'weekKdjSignal',
+			minWidth: 120,
+			dict: kdjSignalDict,
+			sortable: 'desc'
+		},
+		{
+			label: '周KDJ值',
+			prop: 'weekKdjValue',
+			minWidth: 120,
+			sortable: 'desc'
+		},
+		{
+			label: '日KDJ信号',
+			prop: 'dayKdjSignal',
+			minWidth: 100,
+			dict: kdjSignalDict,
+			sortable: 'desc'
+		},
+		{
+			label: '日KDJ值',
+			prop: 'dayKdjValue',
+			minWidth: 100,
+			sortable: 'desc'
 		},
 		{
 			type: 'op',

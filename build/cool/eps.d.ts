@@ -894,29 +894,24 @@ declare namespace Eps {
 		price?: number;
 
 		/**
-		 * 趋势方向
+		 * 周趋势方向
+		 */
+		weekTrendDirection?: string;
+
+		/**
+		 * 周当前状态
+		 */
+		weekTrendState?: string;
+
+		/**
+		 * 日趋势方向
 		 */
 		dayTrendDirection?: string;
 
 		/**
-		 * 当前状态
+		 * 日当前状态
 		 */
 		dayTrendState?: string;
-
-		/**
-		 * KDJ信号
-		 */
-		dayKdjSignal?: string;
-
-		/**
-		 * KDJ值
-		 */
-		dayKdjValue?: number;
-
-		/**
-		 * CCI值
-		 */
-		dayCciValue?: number;
 
 		/**
 		 * 小时趋势方向
@@ -929,17 +924,7 @@ declare namespace Eps {
 		hourCciValue?: number;
 
 		/**
-		 * 周线趋势方向
-		 */
-		weekTrendDirection?: string;
-
-		/**
-		 * 周线当前状态
-		 */
-		weekTrendState?: string;
-
-		/**
-		 * 周线KDJ信号
+		 * 周KDJ信号
 		 */
 		weekKdjSignal?: string;
 
@@ -949,14 +934,19 @@ declare namespace Eps {
 		weekKdjValue?: number;
 
 		/**
-		 * 周线多空趋势
+		 * 日KDJ信号
 		 */
-		weekLongShortTrend?: string;
+		dayKdjSignal?: string;
 
 		/**
-		 * 周线多空状态
+		 * 日KDJ值
 		 */
-		weekLongShortState?: string;
+		dayKdjValue?: number;
+
+		/**
+		 * 日CCI值
+		 */
+		dayCciValue?: number;
 
 		/**
 		 * 创建时间
