@@ -1,10 +1,13 @@
 <template>
 	<cl-crud ref="Crud">
 		<cl-row>
-			<cl-refresh-btn />
 			<el-button type="warning" :loading="tasking" @click="onStartTask">
 				<cl-svg name="icon-task" class="mr-[5px]" />
 				{{ $t('启动更新任务') }}
+			</el-button>
+			<el-button type="success" :loading="exporting" @click="onExport">
+				<cl-svg name="export" class="mr-[5px]" />
+				{{ $t('导出') }}
 			</el-button>
 			<cl-flex1 />
 			<cl-filter :label="$t('周趋势')">
@@ -75,6 +78,8 @@ import { ref, reactive, nextTick } from 'vue';
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { useI18n } from 'vue-i18n';
+import { ElMessage } from 'element-plus';
+import dayjs from 'dayjs';
 import {
 	statusOptions,
 	longShortDict,
@@ -102,28 +107,90 @@ const dayTrendState = ref('');
 const hourTrendDirection = ref('多头');
 const status = ref(1);
 
-// 启动更新任务
-const { tasking, onStartTask } = useStartTask(() =>
-	service.tianqin.data.request({ url: '/startTask', method: 'POST' })
-);
+// 导出
+const exporting = ref(false);
 
-// cl-crud
-const Crud = useCrud(
-	{
-		service: service.tianqin.data,
-		onRefresh(params, { next }) {
-			next({
-				...params,
+async function onExport() {
+	if (exporting.value) return;
+
+	exporting.value = true;
+
+	try {
+		// 获取列表当前的过滤参数（含分页、搜索关键字、筛选条件、排序等）
+
+		const res = await service.tianqin.data.request({
+			url: '/export',
+			method: 'POST',
+			responseType: 'blob',
+			data: {
 				weekTrendDirection: weekTrendDirection.value,
 				weekTrendState: weekTrendState.value,
 				dayTrendDirection: dayTrendDirection.value,
 				dayTrendState: dayTrendState.value,
 				hourTrendDirection: hourTrendDirection.value,
 				status: status.value
-			});
+			}
+		});
+
+		// 从响应头获取文件名
+		const disposition = (res as any)?.headers?.['content-disposition'] || '';
+		let filename = `数据 ${dayjs().format('YYYY-MM-DD HH_mm_ss')}.zip`;
+
+		if (disposition) {
+			const match = disposition.match(/filename\*?=(?:UTF-8'')?(["']?)([^;"'\n]+)\1/i);
+			if (match) {
+				filename = decodeURIComponent(match[2]);
+			}
 		}
+
+		// 创建下载链接
+		const blob = res instanceof Blob ? res : new Blob([res as any]);
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		a.click();
+		URL.revokeObjectURL(url);
+
+		ElMessage.success(t('导出成功'));
+	} catch (err: any) {
+		// 处理blob类型的错误响应
+		if (err instanceof Blob) {
+			const text = await err.text();
+			try {
+				const json = JSON.parse(text);
+				ElMessage.error(json.message || t('导出失败'));
+			} catch {
+				ElMessage.error(t('导出失败'));
+			}
+		} else {
+			ElMessage.error(err?.message || t('导出失败'));
+		}
+	} finally {
+		exporting.value = false;
 	}
+}
+
+// 启动更新任务
+const { tasking, onStartTask } = useStartTask(() =>
+	service.tianqin.data.request({ url: '/startTask', method: 'POST' })
 );
+
+// cl-crud
+const Crud = useCrud({
+	service: service.tianqin.data,
+	onRefresh(params, { next }) {
+		next({
+			...params,
+			weekTrendDirection: weekTrendDirection.value,
+			weekTrendState: weekTrendState.value,
+			dayTrendDirection: dayTrendDirection.value,
+			dayTrendState: dayTrendState.value,
+			hourTrendDirection: hourTrendDirection.value,
+			status: status.value
+		});
+	}
+});
 
 // 筛选条件缓存：进入页面时先恢复缓存条件，再加载列表数据
 useFilterCache(

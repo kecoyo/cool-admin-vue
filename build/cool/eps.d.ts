@@ -904,6 +904,26 @@ declare namespace Eps {
 		weekTrendState?: string;
 
 		/**
+		 * 周MACD趋势方向
+		 */
+		weekMacdTrendDirection?: string;
+
+		/**
+		 * 周MACD当前状态
+		 */
+		weekMacdTrendState?: string;
+
+		/**
+		 * 周KDJ信号
+		 */
+		weekKdjSignal?: string;
+
+		/**
+		 * 周KDJ值
+		 */
+		weekKdjValue?: number;
+
+		/**
 		 * 日趋势方向
 		 */
 		dayTrendDirection?: string;
@@ -914,24 +934,14 @@ declare namespace Eps {
 		dayTrendState?: string;
 
 		/**
-		 * 小时趋势方向
+		 * 日MACD趋势方向
 		 */
-		hourTrendDirection?: string;
+		dayMacdTrendDirection?: string;
 
 		/**
-		 * 小时CCI值
+		 * 日MACD当前状态
 		 */
-		hourCciValue?: number;
-
-		/**
-		 * 周KDJ信号
-		 */
-		weekKdjSignal?: string;
-
-		/**
-		 * 周线KDJ值
-		 */
-		weekKdjValue?: number;
+		dayMacdTrendState?: string;
 
 		/**
 		 * 日KDJ信号
@@ -944,9 +954,14 @@ declare namespace Eps {
 		dayKdjValue?: number;
 
 		/**
-		 * 日CCI值
+		 * 小时趋势方向
 		 */
-		dayCciValue?: number;
+		hourTrendDirection?: string;
+
+		/**
+		 * 小时CCI值
+		 */
+		hourCciValue?: number;
 
 		/**
 		 * 创建时间
@@ -2279,6 +2294,11 @@ declare namespace Eps {
 		startTask(data?: any): Promise<any>;
 
 		/**
+		 * 导出策略文件
+		 */
+		export(data?: any): Promise<any>;
+
+		/**
 		 * 修改
 		 */
 		update(data?: any): Promise<any>;
@@ -2301,13 +2321,21 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { startTask: string; update: string; info: string; list: string; page: string };
+		permission: {
+			startTask: string;
+			export: string;
+			update: string;
+			info: string;
+			list: string;
+			page: string;
+		};
 
 		/**
 		 * 权限状态
 		 */
 		_permission: {
 			startTask: boolean;
+			export: boolean;
 			update: boolean;
 			info: boolean;
 			list: boolean;

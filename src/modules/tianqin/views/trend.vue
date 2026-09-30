@@ -116,7 +116,7 @@ async function onExport() {
 
 		// 从响应头获取文件名
 		const disposition = (res as any)?.headers?.['content-disposition'] || '';
-		let filename = `趋势数据 ${dayjs().format('YYYY-MM-DD HH_mm_ss')}.zip`;
+		let filename = `趋势 ${dayjs().format('YYYY-MM-DD HH_mm_ss')}.zip`;
 
 		if (disposition) {
 			const match = disposition.match(/filename\*?=(?:UTF-8'')?(["']?)([^;"'\n]+)\1/i);
@@ -159,19 +159,17 @@ const { tasking, onStartTask } = useStartTask(() =>
 );
 
 // cl-crud
-const Crud = useCrud(
-	{
-		service: service.tianqin.trend,
-		onRefresh(params, { next }) {
-			next({
-				...params,
-				trendDirection: trendDirection.value,
-				trendState: trendState.value,
-				status: status.value
-			});
-		}
+const Crud = useCrud({
+	service: service.tianqin.trend,
+	onRefresh(params, { next }) {
+		next({
+			...params,
+			trendDirection: trendDirection.value,
+			trendState: trendState.value,
+			status: status.value
+		});
 	}
-);
+});
 
 // 筛选条件缓存：进入页面时先恢复缓存条件，再加载列表数据
 useFilterCache(
