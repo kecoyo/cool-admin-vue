@@ -20,6 +20,12 @@ export const kdjSignalDict = [
 	{ label: '死叉', value: '死叉', type: 'success' }
 ];
 
+// 通用 dict（主要趋势/次级折返）
+export const trendStateDict = [
+	{ label: '主要趋势', value: '主要趋势', type: 'primary' },
+	{ label: '次级折返', value: '次级折返', type: 'warning' }
+];
+
 // 启动后台任务
 export function useStartTask(serviceRequest: () => Promise<any>) {
 	const { t } = useI18n();

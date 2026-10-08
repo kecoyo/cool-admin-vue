@@ -904,16 +904,6 @@ declare namespace Eps {
 		weekTrendState?: string;
 
 		/**
-		 * 周MACD趋势方向
-		 */
-		weekMacdTrendDirection?: string;
-
-		/**
-		 * 周MACD当前状态
-		 */
-		weekMacdTrendState?: string;
-
-		/**
 		 * 周KDJ信号
 		 */
 		weekKdjSignal?: string;
@@ -932,16 +922,6 @@ declare namespace Eps {
 		 * 日当前状态
 		 */
 		dayTrendState?: string;
-
-		/**
-		 * 日MACD趋势方向
-		 */
-		dayMacdTrendDirection?: string;
-
-		/**
-		 * 日MACD当前状态
-		 */
-		dayMacdTrendState?: string;
 
 		/**
 		 * 日KDJ信号

@@ -84,6 +84,7 @@ import {
 	statusOptions,
 	longShortDict,
 	kdjSignalDict,
+	trendStateDict,
 	useStartTask,
 	useAutoRefresh,
 	useFilterCache
@@ -95,13 +96,13 @@ const { t } = useI18n();
 // 选项
 const options = reactive({
 	trendDirection: longShortDict.map(({ type, ...rest }) => rest),
-	trendState: longShortDict.map(({ type, ...rest }) => rest),
+	trendState: trendStateDict.map(({ type, ...rest }) => rest),
 	status: statusOptions
 });
 
 // 参数
 const weekTrendDirection = ref('');
-const weekTrendState = ref('多头');
+const weekTrendState = ref('');
 const dayTrendDirection = ref('多头');
 const dayTrendState = ref('');
 const hourTrendDirection = ref('多头');
@@ -254,7 +255,7 @@ const Table = useTable({
 			label: '周状态',
 			prop: 'weekTrendState',
 			minWidth: 100,
-			dict: longShortDict,
+			dict: trendStateDict,
 			sortable: 'desc'
 		},
 		{
@@ -268,7 +269,7 @@ const Table = useTable({
 			label: '日状态',
 			prop: 'dayTrendState',
 			minWidth: 100,
-			dict: longShortDict,
+			dict: trendStateDict,
 			sortable: 'desc'
 		},
 		{
