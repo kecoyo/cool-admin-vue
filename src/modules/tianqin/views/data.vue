@@ -124,12 +124,12 @@ async function onExport() {
 			method: 'POST',
 			responseType: 'blob',
 			data: {
-				weekTrendDirection: weekTrendDirection.value,
-				weekTrendState: weekTrendState.value,
-				dayTrendDirection: dayTrendDirection.value,
-				dayTrendState: dayTrendState.value,
-				hourTrendDirection: hourTrendDirection.value,
-				status: status.value
+				weekTrendDirection: '',
+				weekTrendState: '主要趋势',
+				dayTrendDirection: '',
+				dayTrendState: '主要趋势',
+				hourTrendDirection: '',
+				status: 1
 			}
 		});
 
