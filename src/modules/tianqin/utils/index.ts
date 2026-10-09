@@ -98,7 +98,8 @@ export function useFilterCache(
 	function save() {
 		const data: Record<string, any> = {};
 		for (const [key, r] of Object.entries(filterRefs)) {
-			data[key] = r.value;
+			// undefined 会被 JSON.stringify 丢弃，转为 null 以正确持久化
+			data[key] = r.value ?? null;
 		}
 		localStorage.setItem(storageKey, JSON.stringify(data));
 	}
