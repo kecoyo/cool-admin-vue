@@ -134,24 +134,26 @@ async function onExport() {
 
 	try {
 		// 获取列表当前的过滤参数（含分页、搜索关键字、筛选条件、排序等）
+		const params = Crud.value?.getParams() || {};
 
+		// 导出主要趋势数据
 		const res = await service.tianqin.data.request({
 			url: '/export',
 			method: 'POST',
 			responseType: 'blob',
 			data: {
-				weekTrendDirection: '',
-				weekTrendState: '主要趋势',
-				dayTrendDirection: '',
-				dayTrendState: '主要趋势',
-				hourTrendDirection: '',
-				status: 1
+				weekTrendDirection: weekTrendDirection.value,
+				weekTrendState: weekTrendState.value,
+				dayTrendDirection: dayTrendDirection.value,
+				dayTrendState: dayTrendState.value,
+				hourTrendDirection: hourTrendDirection.value,
+				status: status.value
 			}
 		});
 
 		// 从响应头获取文件名
 		const disposition = (res as any)?.headers?.['content-disposition'] || '';
-		let filename = `数据 ${dayjs().format('YYYY-MM-DD HH_mm_ss')}.zip`;
+		let filename = `${t('数据')} ${dayjs().format('YYYY-MM-DD HH_mm_ss')}.zip`;
 
 		if (disposition) {
 			const match = disposition.match(/filename\*?=(?:UTF-8'')?(["']?)([^;"'\n]+)\1/i);
@@ -261,42 +263,42 @@ const Table = useTable({
 			minWidth: 100
 		},
 		{
-			label: '周趋势',
+			label: t('周趋势'),
 			prop: 'weekTrendDirection',
 			minWidth: 100,
 			dict: longShortDict,
 			sortable: 'desc'
 		},
 		{
-			label: '周状态',
+			label: t('周状态'),
 			prop: 'weekTrendState',
 			minWidth: 100,
 			dict: trendStateDict,
 			sortable: 'desc'
 		},
 		{
-			label: '日趋势',
+			label: t('日趋势'),
 			prop: 'dayTrendDirection',
 			minWidth: 100,
 			dict: longShortDict,
 			sortable: 'desc'
 		},
 		{
-			label: '日状态',
+			label: t('日状态'),
 			prop: 'dayTrendState',
 			minWidth: 100,
 			dict: trendStateDict,
 			sortable: 'desc'
 		},
 		{
-			label: '小时趋势',
+			label: t('小时趋势'),
 			prop: 'hourTrendDirection',
 			minWidth: 100,
 			dict: longShortDict,
 			sortable: 'desc'
 		},
 		{
-			label: '小时CCI',
+			label: t('小时CCI'),
 			prop: 'hourCciValue',
 			minWidth: 120,
 			sortable: 'desc'
@@ -314,27 +316,27 @@ const Table = useTable({
 			sortable: 'desc'
 		},
 		{
-			label: '周KDJ信号',
+			label: t('周KDJ信号'),
 			prop: 'weekKdjSignal',
 			minWidth: 120,
 			dict: kdjSignalDict,
 			sortable: 'desc'
 		},
 		{
-			label: '周KDJ值',
+			label: t('周KDJ值'),
 			prop: 'weekKdjValue',
 			minWidth: 120,
 			sortable: 'desc'
 		},
 		{
-			label: '日KDJ信号',
+			label: t('日KDJ信号'),
 			prop: 'dayKdjSignal',
 			minWidth: 100,
 			dict: kdjSignalDict,
 			sortable: 'desc'
 		},
 		{
-			label: '日KDJ值',
+			label: t('日KDJ值'),
 			prop: 'dayKdjValue',
 			minWidth: 100,
 			sortable: 'desc'
@@ -569,7 +571,8 @@ const Upsert = useUpsert({
 		const code = data?.contractCode || '';
 		const name = data?.contractName || '';
 		if (code || name) {
-			Upsert.value?.setConfig('dialog.title', `${name}（${code}）`.trim());
+			const title = name && code ? `${name}（${code}）` : name || code;
+			Upsert.value?.setConfig('dialog.title', title);
 		}
 	},
 
@@ -601,33 +604,31 @@ const Upsert = useUpsert({
 		}
 	],
 
-	// 编辑时从 tradeSettings JSON 恢复数据
+	// 编辑时：直接传给表单，TradeSettingsPanel 会通过 modelValue 恢复
 	onInfo(data, { done }) {
-		// data 是行数据，tradeSettings 字段是 JSON 字符串
-		// 直接传给表单，TradeSettingsPanel 会通过 modelValue 恢复
 		done(data);
 	},
 
 	// 保存时：从 tradeSettings JSON 生成操作建议文本，存入 remark
-	onSubmit(data, { done, next }) {
+	onSubmit(data, { next }) {
+		// 没有 tradeSettings 时清空 remark
+		if (!data.tradeSettings) {
+			data.remark = '';
+			next(data);
+			return;
+		}
+
 		// 从 tradeSettings JSON 生成操作建议
 		let remark = '';
 		try {
-			const settings = data.tradeSettings ? JSON.parse(data.tradeSettings) : null;
+			const settings = JSON.parse(data.tradeSettings);
 			if (settings) {
 				remark = formatAdvice(settings as TradeSettings);
 			}
 		} catch {
 			// ignore
 		}
-
-		// 将操作建议放入 remark 字段
 		data.remark = remark;
-
-		// 如果没有 tradeSettings，清空 remark
-		if (!data.tradeSettings) {
-			data.remark = '';
-		}
 
 		next(data);
 	}
