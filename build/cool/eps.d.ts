@@ -964,6 +964,58 @@ declare namespace Eps {
 		[key: string]: any;
 	}
 
+	interface TianqinNoteEntity {
+		/**
+		 * ID
+		 */
+		id?: number;
+
+		/**
+		 * 品种名称
+		 */
+		symbol?: string;
+
+		/**
+		 * 类型：signal信号/idea想法/quest疑问/review复盘/lesson教训
+		 */
+		tag?: string;
+
+		/**
+		 * 状态：watch待观察/ok已验证/no已否决
+		 */
+		noteStatus?: string;
+
+		/**
+		 * 内容
+		 */
+		content?: string;
+
+		/**
+		 * 日期（YYYY-MM-DD）
+		 */
+		noteDate?: string;
+
+		/**
+		 * 时间（HH:mm）
+		 */
+		noteTime?: string;
+
+		/**
+		 * 创建时间
+		 */
+		createTime?: string;
+
+		/**
+		 * 更新时间
+		 */
+		updateTime?: string;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
 	interface TianqinTrendEntity {
 		/**
 		 * ID
@@ -1263,6 +1315,11 @@ declare namespace Eps {
 	interface TianqinDataPageResponse {
 		pagination: PagePagination;
 		list: TianqinDataEntity[];
+	}
+
+	interface TianqinNotePageResponse {
+		pagination: PagePagination;
+		list: TianqinNoteEntity[];
 	}
 
 	interface TianqinTrendPageResponse {
@@ -2330,6 +2387,85 @@ declare namespace Eps {
 		request: Request;
 	}
 
+	interface TianqinNote {
+		/**
+		 * 导出Markdown
+		 */
+		exportMarkdown(data?: any): Promise<any>;
+
+		/**
+		 * 导入备份
+		 */
+		import(data?: any): Promise<any>;
+
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+
+		/**
+		 * 删除
+		 */
+		delete(data?: any): Promise<any>;
+
+		/**
+		 * 统计
+		 */
+		stats(data?: any): Promise<any>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<TianqinNoteEntity>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<TianqinNoteEntity[]>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<TianqinNotePageResponse>;
+
+		/**
+		 * 新增
+		 */
+		add(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			exportMarkdown: string;
+			import: string;
+			update: string;
+			delete: string;
+			stats: string;
+			info: string;
+			list: string;
+			page: string;
+			add: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			exportMarkdown: boolean;
+			import: boolean;
+			update: boolean;
+			delete: boolean;
+			stats: boolean;
+			info: boolean;
+			list: boolean;
+			page: boolean;
+			add: boolean;
+		};
+
+		request: Request;
+	}
+
 	interface TianqinTrend {
 		/**
 		 * 启动任务
@@ -2540,7 +2676,7 @@ declare namespace Eps {
 		recycle: { data: RecycleData };
 		space: { info: SpaceInfo; type: SpaceType };
 		task: { info: TaskInfo };
-		tianqin: { data: TianqinData; trend: TianqinTrend };
+		tianqin: { data: TianqinData; note: TianqinNote; trend: TianqinTrend };
 		user: { address: UserAddress; info: UserInfo };
 	};
 }
