@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="pKB1vZQBDbskTczvMWdquj"><head data-page-node-id="2XWKRrtQF8pdoU1Id2szkR">
+<meta charset="utf-8" data-page-node-id="wwGhIHViCfedROVa4HhqBX">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="Q1t3QCxLvTlIbXgYhLZGUn">
+<title data-page-node-id="LPzZHf8Vd6sDkS40eTzRaE">交易操作工作台</title>
+<style data-page-node-id="oADLHa0Aybu3mG9kFDKSra">
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --panel2:#fafbfc; --line:#e4e7ec; --text:#1b1e23;
+  --muted:#6b7280; --hint:#98a1ae;
+  --up:#d92c2c; --down:#159a5b; --blue:#2f6bd8; --amber:#b0771a; --gray:#8a94a3;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#131519; --panel:#1b1e24; --panel2:#20242b; --line:#2b3038; --text:#e9ebef;
+         --muted:#9aa3ae; --hint:#6f7885;
+         --up:#f0565b; --down:#3cbf7e; --blue:#6ea3f6; --amber:#e0a94b; --gray:#8f98a6; }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 18px 60px}
+
+/* header */
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;margin-bottom:14px}
+.head h1{font-size:19px;font-weight:600;margin:0;letter-spacing:.2px}
+.head .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+button{font:inherit;font-size:13px;cursor:pointer;border-radius:9px;padding:8px 14px;
+  border:1px solid var(--line);background:var(--panel);color:var(--text);transition:.12s}
+button:hover{border-color:var(--gray)}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:500}
+button.primary:hover{filter:brightness(1.08)}
+button.ghost{color:var(--muted)}
+
+/* dashboard */
+.dash{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:20px;overflow:auto}
+.dash h2{font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:.4px}
+.dash table{border-collapse:collapse;width:100%;font-size:12.5px;white-space:nowrap}
+.dash th{text-align:left;font-weight:500;color:var(--hint);padding:4px 14px 6px 0;border-bottom:1px solid var(--line)}
+.dash td{padding:7px 14px 7px 0;border-bottom:1px solid var(--line)}
+.dash tr:last-child td{border-bottom:0}
+.dash .nm{font-weight:500}
+.dash .empty{color:var(--hint);padding:6px 0}
+
+/* card */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  margin-bottom:18px;overflow:hidden}
+.card-head{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.card-head .name{font:inherit;font-weight:600;font-size:15px;color:var(--text);background:transparent;
+  border:1px solid transparent;border-radius:8px;padding:4px 8px;width:170px}
+.card-head .name:hover{border-color:var(--line)}
+.card-head .name:focus{outline:none;border-color:var(--blue);background:var(--panel2)}
+.badge{font-size:12px;font-weight:500;padding:4px 11px;border-radius:999px;border:1px solid transparent}
+.lv-idle{background:#eceef1;color:#5c6673} .lv-wait{background:#fdf3e0;color:#8a5a00}
+.lv-ready{background:#e8effc;color:#1f4fa0} .lv-go{background:#e6f6ee;color:#0f6b3f}
+.lv-hold{background:#e9e6fb;color:#4a3fa5}
+.lv-stop{background:#f2f3f5;color:#5c6673}
+@media (prefers-color-scheme: dark){
+  .lv-idle{background:#282d35;color:#aab3bf} .lv-wait{background:#3a2f14;color:#e6bd6a}
+  .lv-ready{background:#1c2c48;color:#8fb6f5} .lv-go{background:#12331f;color:#6fd3a0}
+  .lv-hold{background:#282343;color:#b0a4f2}
+  .lv-stop{background:#282d35;color:#aab3bf}
+}
+.card-head .spacer{margin-left:auto}
+.card-head .del{color:var(--hint);border-color:transparent;padding:6px 10px}
+.card-head .del:hover{color:var(--up);border-color:var(--line)}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(246px,1fr));gap:0}
+.step{padding:14px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.step:last-child{border-right:0}
+.step h3{font-size:12.5px;font-weight:600;margin:0 0 10px;color:var(--text);display:flex;align-items:center;gap:7px}
+.step h3 i{font-style:normal;width:18px;height:18px;border-radius:6px;background:var(--panel2);
+  border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--muted);flex:0 0 auto}
+.opt{display:flex;align-items:flex-start;gap:8px;padding:3px 0;font-size:13px;cursor:pointer}
+.opt input{margin:4px 0 0;flex:0 0 auto;accent-color:var(--blue)}
+.opt span{color:var(--text)}
+.opt .tick{color:var(--hint);font-size:11.5px}
+.field{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}
+.field label{color:var(--muted);flex:0 0 auto}
+.field input{flex:1;min-width:0;padding:6px 9px;font:inherit;font-size:13px;color:var(--text);
+  background:var(--panel2);border:1px solid var(--line);border-radius:8px}
+.field input:focus{outline:none;border-color:var(--blue)}
+.hint{color:var(--hint);font-size:11.5px;margin:6px 0 0;line-height:1.5}
+
+/* advice */
+.advice{padding:14px 16px 16px;background:var(--panel2);border-top:1px solid var(--line)}
+.adv-head{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;margin-bottom:12px}
+.adv-head .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:var(--gray)}
+.advice.dir-long .dot{background:var(--up)} .advice.dir-short .dot{background:var(--down)}
+.advice .dir-tag{font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:999px}
+.dir-long .dir-tag{background:rgba(217,44,44,.12);color:var(--up)}
+.dir-short .dir-tag{background:rgba(21,154,91,.14);color:var(--down)}
+.adv-notes{margin:0;padding:0;list-style:none;font-size:12.5px}
+.adv-notes li{padding:2px 0;color:var(--muted)}
+.adv-notes li.ok{color:var(--down)} .adv-notes li.warn{color:var(--amber)}
+.adv-notes li.bad{color:var(--up)}
+.adv-plan{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--panel);
+  border:1px dashed var(--line);font-size:12.5px;color:var(--muted);line-height:1.7}
+.adv-plan b{color:var(--text);font-weight:500}
+.adv-actions{margin-top:12px;display:flex;gap:8px;justify-content:flex-end}
+.adv-actions button{font-size:12.5px;padding:6px 12px}
+.card-foot{display:flex;justify-content:flex-end;padding:0 16px 14px}
+.card-foot button{font-size:12.5px;padding:6px 12px}
+
+/* 备注 */
+.noterow{padding:10px 16px;border-top:1px solid var(--line)}
+.noterow .note{width:100%;padding:8px 10px;font:inherit;font-size:12.5px;color:var(--text);
+  background:var(--panel2);border:1px solid var(--line);border-radius:8px}
+.noterow .note:focus{outline:none;border-color:var(--blue)}
+</style>
+<style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
+<body data-page-node-id="Uxh6Fi6zjOYTPsEJyRdQNq" style="">
+<div class="wrap" data-page-node-id="ZNAVvBPIlExYmHHHYLjh5w">
+  <div class="head" data-page-node-id="dy60LfbaMeQ1dDTvIU8WBL">
+    <div data-page-node-id="tRDNlqRiHLgagmRWBW4JTc">
+      <h1 data-page-node-id="x8WDbDNfW3Ufq056W5zQu7">交易操作工作台</h1>
+      <div class="sub" data-page-node-id="n0GoFTpSL69qeGy6sL0BKB">三步流程：定方向 → 等回调 → 找机会入场 · 数据自动存本机浏览器，建议定期「导出备份」</div>
+    </div>
+  </div>
+
+  <div class="btns" data-page-node-id="ejRPJy6mumvkOm0J0Zn4Cc">
+    <button class="primary" id="add" data-page-node-id="wq29lPK08B2JmNMm1vkMTn">+ 添加品种</button>
+    <button class="ghost" id="export" data-page-node-id="t5bf3gr4GHTQzjK4LhOHtD">导出备份</button>
+    <button class="ghost" id="import" data-page-node-id="wVEj57dVNjfVC7FRizuIgk">导入备份</button>
+    <button class="ghost" id="clear" data-page-node-id="vYz1H7if9KsL49cG5f6ZQu">清空全部</button>
+    <input type="file" id="fileInput" accept=".json,application/json" style="display:none" data-page-node-id="mD5AF7dbEXLxNQmJ6hFiBi">
+  </div>
+
+  <div class="dash" data-page-node-id="5YohqZusku0wywbunUFchN">
+    <h2 data-page-node-id="FYV2oWGtYYjqoUDOR9VYhQ">品种汇总</h2>
+    <div id="dashBody" data-page-node-id="ZSTARIS8Yh1jxBDVhAQnLG"><table data-page-node-id="vANIu5jKB6Yj0LHcoQXiQh"><thead data-page-node-id="Y9fVNynp4EMHAvuq4BugNo"><tr data-page-node-id="nzgAWl5iLfj02ZBy7Jf78k"><th data-page-node-id="cAtLlj6ZSbNikIJpLGk5kM">品种</th><th data-page-node-id="iBZTFXInVoOsS8hXIvC7Ua">状态</th><th data-page-node-id="vkvaLIFATELBxYIoPLxhpc">方向</th><th data-page-node-id="a6TgpGUjuGNiZK3nqNeFAm">信号</th></tr></thead><tbody data-page-node-id="bVPW7CsO1hmjuJP5WDvNjF"><tr data-page-node-id="d5hKqORMZdhJmV9tFEQc5H"><td class="nm" data-page-node-id="PrmnniyqbB8ZKN3ORdXuHa">黄金</td><td data-page-node-id="dIsWs93g61Q15JBXarXEeh"><span class="badge lv-wait" data-page-node-id="9rZbu5l3xwgX8cG8n3Qp3s">等待回调</span></td><td data-page-node-id="sFaPJJuClXZBRjFncDTkDP">多</td><td data-page-node-id="5JiDtsPJ9TYv187d9ssJrX">0 / 2</td></tr></tbody></table></div>
+  </div>
+
+  <div id="list" data-page-node-id="JIcw8tc6BxzSRjjnA7qXYy"><div class="card" data-id="fl4jlgq" data-page-node-id="SBcTMHfsobNZLTgYAiwzoP"><div class="card-head" data-page-node-id="Y1Ds1UBuCAJSnjf1ooJ6FA"><input class="name" data-f="name" value="黄金" data-page-node-id="hD9vRiCqZgcBfwJj99QaIS"><span class="badge lv-wait" data-role="badge" data-page-node-id="vlSE33DVjrNP9gJouij0Pw">等待回调</span><span class="spacer" data-page-node-id="A7GAiALU90Vylr1lbjWL3o"></span><button class="del" data-act="del" data-page-node-id="zap2fxso4ImKBcAgFQmDJQ">删除</button></div><div class="steps" data-page-node-id="MThaN3hmfvVahxqxLFnwgT"><div class="step" data-page-node-id="weMMFIhqwTyLgCjQqFZXWB"><h3 data-page-node-id="xwVz4lElK95MgTC9pkU6ij"><i data-page-node-id="QTf4Jwk4D1CD9WZCxQYJl3">1</i>定方向</h3><label class="opt" data-page-node-id="1iDNBDlbVAdcPLjPmoDSWg"><input type="radio" name="ema-fl4jlgq" data-f="ema" value="up" checked="" data-page-node-id="MqCyNB0QDLaolqgmPZjwXk"><span data-page-node-id="I1Vh2xOhH6DMd6rMsbj01F">EMA60 向上 → 只做多</span></label><label class="opt" data-page-node-id="3HvY7B2U2Ft6FX2rdZ8RG3"><input type="radio" name="ema-fl4jlgq" data-f="ema" value="down" data-page-node-id="vCYSNEybJkE0T2EW6b8vXx"><span data-page-node-id="S9rOf4YUnzTRxRnXTCmU8p">EMA60 向下 → 只做空</span></label><label class="opt" data-page-node-id="XN4Q2HmGqXHSSuV9iOVEOD"><input type="radio" name="ema-fl4jlgq" data-f="ema" value="flat" data-page-node-id="P2buK6nMdfgTy2nn23VzHR"><span data-page-node-id="suJ1wZ7rpRFlWDB6iIjfGw">EMA60 走平 → 空仓</span></label><p class="hint" data-page-node-id="xSP8fBr7HIuawJAVY4ChmT">趋势由 EMA60 斜率单独决定；±2% 是「假破位容忍带」。</p></div><div class="step" data-page-node-id="O19XjUk7yfzlrf6uzT1dJq"><h3 data-page-node-id="IY7YHjZ2hY7cx9zerCJBpL"><i data-page-node-id="EHLwfGD2FbRIQV0XkJ921X">2</i>等回调</h3><div style="font-size:12px;color:var(--hint);margin-bottom:4px" data-page-node-id="F59pUQwifgKygfX0Do8H6Y">回调到位：① 或 ② 满足任一即可</div><label class="opt" data-page-node-id="7lPlHOExeAXKvj1AUT7qYO"><input type="checkbox" data-f="inBand" data-page-node-id="1HKC0eTiTva6kGbMgRSRRU"><span data-page-node-id="ifBJsTKA9CIgMtMl8cLcaE">① 价格已回到 EMA60 ± 2% 带</span></label><div class="field" data-page-node-id="5QH1yexsS6ntzfi1VpzeND"><label data-page-node-id="QYJiIB97iBbN3ku1WQFuvb">回撤比例</label><input type="number" step="0.1" min="0" max="100" data-f="retrace" value="" placeholder="38.2" data-page-node-id="cBargsSwLeMqaudQ7gCIkU"></div><label class="opt" data-page-node-id="1VzNqEWKiLvDu0kP9lVaKQ"><input type="checkbox" data-f="cci60" data-page-node-id="CA4zvSATwKlNGdqzBGNBMb"><span data-page-node-id="o1SCkSCx8GwnHcr2TkhMAL">② 60分钟 CCI(60) 下穿 −100</span></label><p class="hint" data-page-node-id="wPfD9s0KPCCbp9YSdvoUrt">① 或 ② 满足任一 → 回调到位；回撤是质量校验（20%~61.8% 可接受，38.2%~50% 最佳）。</p></div><div class="step" data-page-node-id="01g8DVDS9Httj7FRNKsnAF"><h3 data-page-node-id="BE7Ci7lynnViMWB01IiCF5"><i data-page-node-id="ISlVRovY2DU6AH2MuRAgRS">3</i>找机会入场</h3><div style="font-size:12px;color:var(--hint);margin-bottom:4px" data-page-node-id="HBg3CYpWcr5F4MW5zaiaiV">① 信号池（≥2 项）</div><label class="opt" data-page-node-id="Al3bIfc4b3lOPFAWaC1dH9"><input type="checkbox" data-f="sig" data-k="structure" data-page-node-id="NYKDGMVPmLFgKnm0GtEAHo"><span data-page-node-id="V0BDgvPeFJAW91QDCpFB7L"><b data-page-node-id="zBTQl1NWSqbvzvCuB134y6">结构</b> <span class="tick" data-page-node-id="GuKsBZWkSj1qrUoiW36Aa6">低点不再创新低</span></span></label><label class="opt" data-page-node-id="JKV0Si2yJQR1ICBjPNlXZ7"><input type="checkbox" data-f="sig" data-k="kline" data-page-node-id="vK8G6z6DD1QQqX3Ynkg6Mj"><span data-page-node-id="iiQtEYiRi8fvR1Wa0aMjQl"><b data-page-node-id="xbf0iORXEiCuGzgTL3nOCR">K线</b> <span class="tick" data-page-node-id="z3sDqhw7O9fiDVDHxO3YFC">下影线 / 锤子线 / 阳线企稳</span></span></label><label class="opt" data-page-node-id="dHMl8JyyLMEqqYNrxZAGMn"><input type="checkbox" data-f="sig" data-k="mtm" data-page-node-id="HvrnN2pj6xaZaAo7XexuGa"><span data-page-node-id="cdj5kdlzv1oemVxvv7QlnM"><b data-page-node-id="J6zFv7btxVdFqghiSDCROC">MTM</b> <span class="tick" data-page-node-id="eAocHp3makg7JjBUv2eKro">底背离 + 上穿 MTMMA</span></span></label><label class="opt" data-page-node-id="aaI638DnB4epyBaOGHdWgJ"><input type="checkbox" data-f="sig" data-k="wobv" data-page-node-id="sWFh49DFEZJCm0JZdPyGqv"><span data-page-node-id="UG53Rfb5D5qjBJZAVL3dqt"><b data-page-node-id="S97jqZwUMlxv0upKELDWyD">WOBV</b> <span class="tick" data-page-node-id="QbJu0b9sQgEaCBWt8PVENG">底背离 + 上穿 SSMA</span></span></label><label class="opt" data-page-node-id="NLftHxdEWkRcCB3lSBK9zx"><input type="checkbox" data-f="sig" data-k="rsi" data-page-node-id="2hH08VGrXNhC9p3FQyEwvb"><span data-page-node-id="iuauYhMyCumVGPQcPCEetM"><b data-page-node-id="0G9ejlp8CHxEpy80xhJ3Fo">RSI</b> <span class="tick" data-page-node-id="bfnTN8svlqklCD1mxB2AnC">从 30 以下回升</span></span></label><label class="opt" data-page-node-id="fjHPir8TFgHkTDF2dWJoaL"><input type="checkbox" data-f="sig" data-k="volume" data-page-node-id="2PaNYBjosTVHkEmFS9ARzY"><span data-page-node-id="JycoRmjrRGyyw2YNm4nDiC"><b data-page-node-id="OEElB5vKZU9XjGs7SH9GYl">量能</b> <span class="tick" data-page-node-id="XVO8lTtIerDSgoXfVhICW8">缩量回调后放量上涨</span></span></label><label class="opt" data-page-node-id="5kdOIlY4Gj9sOhCSedWWXx"><input type="checkbox" data-f="sig" data-k="macd" data-page-node-id="f2Pum9fRARG0ltyfSiqEqA"><span data-page-node-id="sUf4oCar4fAKCBLt8rGU9P"><b data-page-node-id="WdLnBBEkdfNDQsGqD0odK0">MACD</b> <span class="tick" data-page-node-id="AaEXo8GFhPIMXwpcHcAYEp">绿柱缩短 + DIF 拐头</span></span></label><div style="font-size:12px;color:var(--hint);margin:10px 0 4px" data-page-node-id="Xobta2GwF18oFmqRnKO0vK">② 60分钟扳机</div><label class="opt" data-page-node-id="d7pFYk5a8Qi5T8XsFiAL8C"><input type="checkbox" data-f="t60break" data-page-node-id="mG1L1X8V0p75TLGMVUH74v"><span data-page-node-id="phftCEOKYzo2EUUsvmRBQU">突破回调波段内部小高点</span></label><label class="opt" data-page-node-id="pCNOEfEx8fAOCVflt4f1ua"><input type="checkbox" data-f="t60wobv" data-page-node-id="FHopZ2WuMu7Y6hiDigIhup"><span data-page-node-id="jtzDwwCZ8JAIHAv3xrgukd">WOBV 金叉上穿 SSMA60</span></label><label class="opt" data-page-node-id="cYcS7GCnLMKOmzvAb1GcVh"><input type="checkbox" data-f="t60cci" data-page-node-id="JACJSwhXAo5DGyzArmdIyv"><span data-page-node-id="w8A4ukA7eDjtXtky1chY9y" style="white-space: pre-wrap;">CCI60 上穿下降趋势线​​</span></label><p class="hint" data-page-node-id="okPbSA2xxrQeroCYcVX51g">三条都满足，入场时机才算成立；等 60分钟K线收盘确认，不盘中抢跑。趋势线为手工画线，固定只连最近 2~3 个明显高点。</p></div></div><div class="noterow" data-page-node-id="nqwgK3FzzHJEeRaywlrDlX"><input class="note" data-f="note" value="" placeholder="备注：今天为什么这么判 / 执行情况 / 持仓量（OI）变化…" data-page-node-id="RpxiyohTHbFb8yDhXwfWAm"></div><div data-role="advice" data-page-node-id="gmEoORNItdExHPWSEnBnrc"><div class="advice lv-wait dir-long" data-page-node-id="S4A0trLULzOMpEDAfxlAia"><div class="adv-head" data-page-node-id="Wn8JYWc8PLeb9eBTwE100s"><span class="dot" data-page-node-id="d3YLCkt0QrgMg1in8uLQ0e"></span><span data-page-node-id="Hk2ZmEAtuTPPmNXAXj5Frp">等待回调</span><span class="dir-tag" data-page-node-id="9G4V9OOe7ARL2YCsbPIx7d">做多 · 红</span></div><ul class="adv-notes" data-page-node-id="nIJASA69BfxBqKekoJi4bN"><li class="" data-page-node-id="s8Tu2LgNrQUu85YAFDDBim">· ① 未回到 EMA60 ± 2% 带、② 60分钟 CCI(60) 未触发 → 继续等，不追</li></ul></div></div><div class="card-foot" data-page-node-id="AbQUzgvqgYFP0ULGH21CzC"><button data-act="copy" data-page-node-id="zoaTF2T608K5Rh7olDOHDH">复制建议</button></div></div></div>
+</div>
+
+<script data-page-node-id="Es38uQNvfRTQUzjBDVkc9g">
+const LS_KEY = 'ema60-workbench';                 /* 固定键，以后不再改 */
+const LEGACY_KEYS = ['ema60-workbench-v2', 'ema60-workbench-v1'];  /* 旧版本数据，自动迁移 */
+const $ = s => document.querySelector(s);
+const listEl = $('#list'), dashBody = $('#dashBody');
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+const SIGNALS = [
+  ['structure', '结构', '低点不再创新低'],
+  ['kline',     'K线',  '下影线 / 锤子线 / 阳线企稳'],
+  ['mtm',       'MTM',  '底背离 + 上穿 MTMMA'],
+  ['wobv',      'WOBV', '底背离 + 上穿 SSMA'],
+  ['rsi',       'RSI',  '从 30 以下回升'],
+  ['volume',    '量能', '缩量回调后放量上涨'],
+  ['macd',      'MACD', '绿柱缩短 + DIF 拐头'],
+];
+const SHORT_TEXT = {
+  structure:'高点不再创新高', kline:'上影线 / 射击之星 / 阴线转弱',
+  mtm:'顶背离 + 下穿 MTMMA', wobv:'顶背离 + 下穿 SSMA',
+  rsi:'从 70 以上回落', volume:'缩量反弹后放量下跌', macd:'红柱缩短 + DIF 拐头'
+};
+const LONG_TEXT = Object.fromEntries(SIGNALS.map(s => [s[0], s[2]]));
+
+/* 随方向变化的界面文案（做多 / 做空 / 未定） */
+const INBAND_TEXT = { long:'价格已回到 EMA60 ± 2% 带', short:'价格已反弹到 EMA60 ± 2% 带', neutral:'价格已回到 EMA60 ± 2% 带' };
+const T60BREAK_TEXT   = { long:'突破回调波段内部小高点',   short:'跌破反弹波段内部小低点',   neutral:'突破回调波段内部小高点' };
+const T60CONFIRM_TEXT = { long:'WOBV 金叉上穿 SSMA60', short:'WOBV 死叉跌破 SSMA60', neutral:'WOBV 金叉 / 死叉穿越 SSMA60' };
+const CCI60_TEXT      = { long:'60分钟 CCI(60) 下穿 −100', short:'60分钟 CCI(60) 上穿 +100', neutral:'60分钟 CCI(60) 穿越 −100 / +100' };
+const CCI60_MIN       = { long:'CCI(60) 下穿 −100', short:'CCI(60) 上穿 +100', neutral:'CCI(60) 穿越 ±100' };
+const T60CCI_TEXT     = { long:'CCI60 上穿下降趋势线', short:'CCI60 下穿上升趋势线', neutral:'CCI60 上穿 / 下穿趋势线' };
+function byDir(map, dir){ return map[dir] || map.neutral; }
+
+function blank(name){
+  return {
+    id: uid(), name: name || '新品种',
+    ema: '', inBand: false, retrace: '', cci60: false,
+    signals: { structure:false, kline:false, mtm:false, wobv:false, rsi:false, volume:false, macd:false },
+    t60break: false, t60wobv: false, t60cci: false,
+    pos: false, entryDate: '',
+    note: ''
+  };
+}
+let state = load();
+
+function load(){
+  try{
+    let raw = localStorage.getItem(LS_KEY), migrated = false;
+    if(!raw){
+      for(const k of LEGACY_KEYS){
+        const old = localStorage.getItem(k);
+        if(old){ raw = old; migrated = true; break; }
+      }
+    }
+    if(raw){
+      const s = JSON.parse(raw);
+      if(s && Array.isArray(s.items) && s.items.length){
+        const st = normalize(s);
+        if(migrated) save(st);      /* 迁移到固定键，旧键保留作备份 */
+        return st;
+      }
+    }
+  }catch(e){}
+  return { items: [blank('黄金')] };
+}
+function normalize(s){
+  s.items = (s.items || []).map(o => {
+    const b = blank(o && o.name ? o.name : '新品种');
+    if(o){
+      if(o.ema === 'up' || o.ema === 'down' || o.ema === 'flat') b.ema = o.ema;
+      b.inBand = !!o.inBand;
+      b.retrace = (o.retrace == null ? '' : String(o.retrace));
+      b.cci60 = !!o.cci60;
+      if(o.signals) SIGNALS.forEach(g => { if(o.signals[g[0]] != null) b.signals[g[0]] = !!o.signals[g[0]]; });
+      b.t60break = !!o.t60break; b.t60wobv = !!o.t60wobv; b.t60cci = !!o.t60cci;
+      b.pos = !!o.pos;
+      b.entryDate = (o.entryDate == null ? '' : String(o.entryDate));
+      b.note = (o.note == null ? '' : String(o.note));
+    }
+    return b;
+  });
+  if(!s.items.length) s.items = [blank('黄金')];
+  return s;
+}
+function save(s){ try{ localStorage.setItem(LS_KEY, JSON.stringify(s || state)); }catch(e){} }
+
+const num = v => (v === '' || v == null || isNaN(Number(v))) ? null : Number(v);
+function dirOf(it){ return it.ema === 'up' ? 'long' : it.ema === 'down' ? 'short' : ''; }
+function sigText(key, dir){ return dir === 'short' ? SHORT_TEXT[key] : LONG_TEXT[key]; }
+
+/* 日期助手：入场日 / 已持有天数 */
+function todayStr(){
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+}
+function heldDays(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+  if(!m) return null;
+  const t = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const n = new Date();
+  const today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  const d = Math.round((today - t) / 86400000);
+  return d >= 0 ? d : null;
+}
+
+/* 信号池 = 7 项日线信号（CCI60 只做第2步第一关，不计入信号数） */
+function activeSigs(it){
+  return SIGNALS.filter(s => it.signals[s[0]]).map(s => s[1]);
+}
+
+/* ---------- 核心判定 ---------- */
+function evaluate(it){
+  const r = { level:'idle', label:'待设置', dir:dirOf(it), notes:[] };
+
+  /* 持仓中：最高优先级，出这个状态就不再喊买入 */
+  if(it.pos){
+    r.level = 'hold'; r.label = '持仓中';
+    r.notes.push(['ok', '已标记入场' + (it.entryDate ? '（' + it.entryDate + '）' : '') + ' → 仓位 / 止损 / 出场交给量化软件']);
+    const d = heldDays(it.entryDate);
+    if(d != null) r.notes.push(['', '已持有 ' + d + ' 天']);
+    r.notes.push(['', '离场后点「标记已离场」复位，重新等下一次回调']);
+    return r;
+  }
+
+  /* 第1步 方向 */
+  if(!it.ema){ r.notes.push(['', '请先选择 EMA60 状态']); return r; }
+  if(it.ema === 'flat'){
+    r.level = 'stop'; r.label = '空仓';
+    r.notes.push(['bad', 'EMA60 走平 → 不交易']);
+    return r;
+  }
+  const dir = dirOf(it), isLong = dir === 'long';
+  r.dir = dir;
+
+  /* 第2步 回调到位：① 均线带 或 ② 60分钟 CCI60 —— 满足任一即可 */
+  if(!it.inBand && !it.cci60){
+    r.level = 'wait'; r.label = '等待回调';
+    r.notes.push(['', '① 未回到 EMA60 ± 2% 带、② 60分钟 CCI(60) 未触发 → 继续等，不追']);
+    return r;
+  }
+  if(it.inBand) r.notes.push(['ok', '回调到位 ①：' + byDir(INBAND_TEXT, dir)]);
+  if(it.cci60)  r.notes.push(['ok', '回调到位 ②：60分钟 ' + byDir(CCI60_MIN, dir)]);
+
+  const ret = num(it.retrace);
+  if(ret != null){
+    if(ret > 61.8){ r.level='stop'; r.label='放弃'; r.notes.push(['bad', '回撤 '+ret+'% ＞ 61.8%，趋势可能已破坏，不是良性回调']); return r; }
+    if(ret < 20){ r.level='wait'; r.label='回调偏浅'; r.notes.push(['warn', '回撤仅 '+ret+'%，回调太浅，容易继续跌']); return r; }
+    if(ret >= 38.2 && ret <= 50) r.notes.push(['ok', '回撤 '+ret+'% 落在最佳区间 38.2%~50%']);
+    else r.notes.push(['', '回撤 '+ret+'%（可接受区 20%~61.8%）']);
+  } else {
+    r.notes.push(['warn', '未填回撤比例（建议 38.2%~50% 最佳）']);
+  }
+
+  /* 信号池（日线 7 项 + 60分钟 CCI60） */
+  const sigs = activeSigs(it);
+  if(sigs.length < 2){
+    r.level = 'wait'; r.label = '等待信号';
+    r.notes.push(['warn', '信号仅 '+sigs.length+' 项，需 ≥2 项（结构/K线/MTM/WOBV/RSI/CCI60/量能/MACD）']);
+    return r;
+  }
+  r.notes.push(['ok', '信号 '+sigs.length+' 项：'+sigs.join('、')]);
+
+  /* 第3步② 60分钟扳机 */
+  if(!it.t60break){
+    r.level = 'wait'; r.label = '等待扳机';
+    r.notes.push(['warn', '60分钟尚未' + byDir(T60BREAK_TEXT, dir) + ' → 等收盘确认']);
+    return r;
+  }
+  r.notes.push(['ok', '60分钟已' + byDir(T60BREAK_TEXT, dir) + '（扳机成立）']);
+  if(!it.t60wobv){
+    r.level = 'wait'; r.label = '等待扳机确认';
+    r.notes.push(['warn', '60分钟 ' + byDir(T60CONFIRM_TEXT, dir) + ' 尚未出现 → 等确认']);
+    return r;
+  }
+  r.notes.push(['ok', '60分钟已 ' + byDir(T60CONFIRM_TEXT, dir) + '（确认成立）']);
+  if(!it.t60cci){
+    r.level = 'wait'; r.label = '等待趋势线确认';
+    r.notes.push(['warn', '60分钟 ' + byDir(T60CCI_TEXT, dir) + ' 尚未出现 → 等确认']);
+    return r;
+  }
+  r.notes.push(['ok', '60分钟已 ' + byDir(T60CCI_TEXT, dir) + '（动能确认成立）']);
+
+  r.level = 'go'; r.label = isLong ? '★ 可以买入' : '★ 可以卖出';
+  r.notes.push(['ok', '入场条件齐备 → 一次性进场（仓位 / 止损由量化软件管理）']);
+  return r;
+}
+
+/* ---------- 渲染 ---------- */
+function cardHTML(it){
+  const dir = dirOf(it);
+  const sigList = SIGNALS.map(s => {
+    const on = it.signals[s[0]] ? ' checked' : '';
+    return '<label class="opt"><input type="checkbox" data-f="sig" data-k="'+s[0]+'"'+on+'>'+
+           '<span><b>'+s[1]+'</b> <span class="tick">'+sigText(s[0], dir)+'</span></span></label>';
+  }).join('');
+
+  const emaRadio = [['up','EMA60 向上 → 只做多'],['down','EMA60 向下 → 只做空'],['flat','EMA60 走平 → 空仓']]
+    .map(o => '<label class="opt"><input type="radio" name="ema-'+it.id+'" data-f="ema" value="'+o[0]+'"'+
+      (it.ema === o[0] ? ' checked' : '')+'><span>'+o[1]+'</span></label>').join('');
+
+  return ''+
+  '<div class="step">'+
+    '<h3><i>1</i>定方向</h3>'+ emaRadio +
+    '<p class="hint">趋势由 EMA60 斜率单独决定；±2% 是「假破位容忍带」。</p>'+
+  '</div>'+
+  '<div class="step">'+
+    '<h3><i>2</i>等回调</h3>'+
+    '<div style="font-size:12px;color:var(--hint);margin-bottom:4px">回调到位：① 或 ② 满足任一即可</div>'+
+    '<label class="opt"><input type="checkbox" data-f="inBand"'+(it.inBand?' checked':'')+'><span>① '+byDir(INBAND_TEXT, dir)+'</span></label>'+
+    '<div class="field"><label>回撤比例</label><input type="number" step="0.1" min="0" max="100" data-f="retrace" value="'+(it.retrace)+'" placeholder="38.2"></div>'+
+    '<label class="opt"><input type="checkbox" data-f="cci60"'+(it.cci60?' checked':'')+'><span>② '+byDir(CCI60_TEXT, dir)+'</span></label>'+
+    '<p class="hint">① 或 ② 满足任一 → 回调到位；回撤是质量校验（20%~61.8% 可接受，38.2%~50% 最佳）。</p>'+
+  '</div>'+
+  '<div class="step">'+
+    '<h3><i>3</i>找机会入场</h3>'+
+    '<div style="font-size:12px;color:var(--hint);margin-bottom:4px">① 信号池（≥2 项）</div>'+
+    sigList+
+    '<div style="font-size:12px;color:var(--hint);margin:10px 0 4px">② 60分钟扳机</div>'+
+    '<label class="opt"><input type="checkbox" data-f="t60break"'+(it.t60break?' checked':'')+'><span>'+byDir(T60BREAK_TEXT, dir)+'</span></label>'+
+    '<label class="opt"><input type="checkbox" data-f="t60wobv"'+(it.t60wobv?' checked':'')+'><span>'+byDir(T60CONFIRM_TEXT, dir)+'</span></label>'+
+    '<label class="opt"><input type="checkbox" data-f="t60cci"'+(it.t60cci?' checked':'')+'><span>'+byDir(T60CCI_TEXT, dir)+'</span></label>'+
+    '<p class="hint">三条都满足，入场时机才算成立；等 60分钟K线收盘确认，不盘中抢跑。趋势线为手工画线，固定只连最近 2~3 个明显高点。</p>'+
+  '</div>';
+}
+
+function adviceHTML(it){
+  const r = evaluate(it);
+  const cls = 'advice lv-'+r.level+(r.dir ? ' dir-'+r.dir : '');
+  let body = '<div class="adv-head"><span class="dot"></span>'+
+    '<span>'+r.label+'</span>'+
+    (r.dir ? '<span class="dir-tag">'+(r.dir === 'long' ? '做多 · 红' : '做空 · 绿')+'</span>' : '')+
+    '</div>';
+
+  body += '<ul class="adv-notes">'+ r.notes.map(x => '<li class="'+(x[0]||'')+'">'+(x[0]==='ok'?'✔ ':x[0]==='warn'?'⚠ ':x[0]==='bad'?'✕ ':'· ')+x[1]+'</li>').join('') +'</ul>';
+
+  if(r.level === 'go'){
+    body += '<div class="adv-plan"><b>执行：</b>一次性进场 —— 入场后仓位、止损与出场交给量化软件自动管理。</div>';
+    body += '<div class="adv-actions"><button class="primary" data-act="in">标记已入场</button></div>';
+  } else if(r.level === 'hold'){
+    body += '<div class="adv-plan"><b>持仓中：</b>本系统这一步已完成，仓位 / 止损 / 出场全部交给量化软件；离场后再点下方复位。</div>';
+    body += '<div class="adv-actions"><button data-act="out">标记已离场（复位）</button></div>';
+  }
+  return '<div class="'+cls+'">'+body+'</div>';
+}
+
+function dashHTML(){
+  if(!state.items.length) return '<div class="empty">还没有品种，点上方「+ 添加品种」开始。</div>';
+  const rows = state.items.map(it => {
+    const r = evaluate(it);
+    const dirTxt = r.dir === 'long' ? '多' : r.dir === 'short' ? '空' : '—';
+    const sigN = activeSigs(it).length;
+    return '<tr>'+
+      '<td class="nm">'+esc(it.name)+'</td>'+
+      '<td><span class="badge lv-'+r.level+'">'+r.label+'</span></td>'+
+      '<td>'+dirTxt+'</td>'+
+      '<td>'+sigN+' / 2</td>'+
+    '</tr>';
+  }).join('');
+  return '<table><thead><tr><th>品种</th><th>状态</th><th>方向</th><th>信号</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderList(){
+  listEl.innerHTML = state.items.map(it =>
+    '<div class="card" data-id="'+it.id+'">'+
+      '<div class="card-head">'+
+        '<input class="name" data-f="name" value="'+esc(it.name)+'">'+
+        '<span class="badge lv-idle" data-role="badge"></span>'+
+        '<span class="spacer"></span>'+
+        '<button class="del" data-act="del">删除</button>'+
+      '</div>'+
+      '<div class="steps">'+ cardHTML(it) +'</div>'+
+      '<div class="noterow"><input class="note" data-f="note" value="'+esc(it.note||'')+'" placeholder="备注：今天为什么这么判 / 执行情况 / 持仓量（OI）变化…"></div>'+
+      '<div data-role="advice">'+ adviceHTML(it) +'</div>'+
+      '<div class="card-foot"><button data-act="copy">复制建议</button></div>'+
+    '</div>'
+  ).join('');
+  state.items.forEach(it => refresh(it.id));
+  renderDash();
+}
+function renderDash(){ dashBody.innerHTML = dashHTML(); }
+
+function refresh(id){
+  const card = listEl.querySelector('.card[data-id="'+id+'"]');
+  if(!card) return;
+  const it = state.items.find(x => x.id === id);
+  if(!it) return;
+  const r = evaluate(it);
+  const badge = card.querySelector('[data-role="badge"]');
+  if(badge){ badge.className = 'badge lv-'+r.level; badge.textContent = r.label; }
+  const adv = card.querySelector('[data-role="advice"]');
+  if(adv) adv.innerHTML = adviceHTML(it);
+  renderDash();
+}
+
+/* ---------- 事件 ---------- */
+listEl.addEventListener('input', onField);
+listEl.addEventListener('change', onField);
+function onField(e){
+  const el = e.target;
+  const card = el.closest('.card'); if(!card) return;
+  const it = state.items.find(x => x.id === card.dataset.id); if(!it) return;
+  const f = el.dataset.f; if(!f) return;
+
+  if(f === 'sig') it.signals[el.dataset.k] = el.checked;
+  else if(el.type === 'checkbox') it[f] = el.checked;
+  else if(el.type === 'radio'){ if(el.checked) it[f] = el.value; }
+  else it[f] = el.value;
+
+  save();
+  if(f === 'ema'){ card.querySelector('.steps').innerHTML = cardHTML(it); refresh(it.id); }
+  else refresh(it.id);
+}
+
+listEl.addEventListener('click', e => {
+  const btn = e.target.closest('button'); if(!btn) return;
+  const card = btn.closest('.card'); if(!card) return;
+  const id = card.dataset.id;
+  if(btn.dataset.act === 'del'){
+    if(confirm('删除该品种？')){ state.items = state.items.filter(x => x.id !== id); save(); renderList(); }
+  } else if(btn.dataset.act === 'copy'){
+    const it = state.items.find(x => x.id === id); if(!it) return;
+    copyAdvice(it, btn);
+  } else if(btn.dataset.act === 'in'){
+    const it = state.items.find(x => x.id === id); if(!it) return;
+    it.pos = true; it.entryDate = todayStr();
+    save(); refresh(id);
+  } else if(btn.dataset.act === 'out'){
+    const it = state.items.find(x => x.id === id); if(!it) return;
+    if(confirm('标记「已离场」并复位？\n该品种的勾选、回撤比例与备注都会被清空（只保留品种名）。')){
+      const fresh = blank(it.name); fresh.id = it.id;
+      state.items = state.items.map(x => x.id === id ? fresh : x);
+      save(); renderList();
+    }
+  }
+});
+
+function copyAdvice(it, btn){
+  const r = evaluate(it);
+  let t = '【'+it.name+'】'+r.label+(r.dir ? '（'+(r.dir==='long'?'做多':'做空')+'）' : '')+'\n';
+  r.notes.forEach(x => { if(x[1]) t += '· '+x[1]+'\n'; });
+  if(r.level === 'go') t += '执行：一次性进场，仓位/止损/出场由量化软件管理\n';
+  else if(r.level === 'hold') t += '状态：持仓中，仓位/止损/出场由量化软件管理\n';
+  navigator.clipboard.writeText(t).then(() => {
+    const old = btn.textContent; btn.textContent = '已复制 ✓'; setTimeout(() => btn.textContent = old, 1200);
+  }).catch(() => alert('复制失败，请手动选择文本'));
+}
+
+$('#add').addEventListener('click', () => {
+  const base = '品种 ' + (state.items.length + 1);
+  state.items.push(blank(base)); save(); renderList();
+});
+
+/* 导出 / 导入备份 —— 数据脱离浏览器存储，换机器、换地址都能带走 */
+$('#export').addEventListener('click', () => {
+  const d = new Date();
+  const stamp = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '交易工作台备份-' + stamp + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+$('#import').addEventListener('click', () => $('#fileInput').click());
+$('#fileInput').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let s;
+    try{
+      s = JSON.parse(reader.result);
+      if(!s || !Array.isArray(s.items)) throw new Error('bad');
+    }catch(err){ alert('文件格式不正确，请选择本工作台导出的 JSON 备份'); return; }
+    if(!confirm('导入将覆盖当前全部品种，确定继续？')) return;
+    state = normalize(s);
+    save(); renderList();
+  };
+  reader.readAsText(f);
+});
+$('#clear').addEventListener('click', () => {
+  if(confirm('清空全部品种？')){
+    state = { items: [blank('黄金')] };
+    save(); renderList();
+  }
+});
+
+/* ---------- 初始化 ---------- */
+renderList();
+</script>
+
+
+
+</body></html>

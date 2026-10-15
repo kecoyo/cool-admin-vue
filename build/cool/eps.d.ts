@@ -2389,16 +2389,6 @@ declare namespace Eps {
 
 	interface TianqinNote {
 		/**
-		 * 导出Markdown
-		 */
-		exportMarkdown(data?: any): Promise<any>;
-
-		/**
-		 * 导入备份
-		 */
-		import(data?: any): Promise<any>;
-
-		/**
 		 * 修改
 		 */
 		update(data?: any): Promise<any>;
@@ -2407,11 +2397,6 @@ declare namespace Eps {
 		 * 删除
 		 */
 		delete(data?: any): Promise<any>;
-
-		/**
-		 * 统计
-		 */
-		stats(data?: any): Promise<any>;
 
 		/**
 		 * 单个信息
@@ -2437,11 +2422,8 @@ declare namespace Eps {
 		 * 权限标识
 		 */
 		permission: {
-			exportMarkdown: string;
-			import: string;
 			update: string;
 			delete: string;
-			stats: string;
 			info: string;
 			list: string;
 			page: string;
@@ -2452,11 +2434,8 @@ declare namespace Eps {
 		 * 权限状态
 		 */
 		_permission: {
-			exportMarkdown: boolean;
-			import: boolean;
 			update: boolean;
 			delete: boolean;
-			stats: boolean;
 			info: boolean;
 			list: boolean;
 			page: boolean;

@@ -669,7 +669,7 @@ const Upsert = useUpsert({
 .ts-step h3 {
 	font-size: 12.5px;
 	font-weight: 600;
-	margin: 0 0 10px;
+	margin: 0 0 0;
 	display: flex;
 	align-items: center;
 	gap: 7px;
@@ -694,7 +694,7 @@ const Upsert = useUpsert({
 	display: flex;
 	align-items: flex-start;
 	gap: 8px;
-	padding: 3px 0;
+	padding: 0 0;
 	font-size: 13px;
 	cursor: pointer;
 }
@@ -760,7 +760,7 @@ const Upsert = useUpsert({
 	gap: 10px;
 	font-size: 14px;
 	font-weight: 600;
-	margin-bottom: 12px;
+	margin-bottom: 10px;
 }
 
 .ts-adv-head .ts-dot {
@@ -782,7 +782,7 @@ const Upsert = useUpsert({
 .ts-dir-tag {
 	font-size: 11.5px;
 	font-weight: 500;
-	padding: 2px 9px;
+	padding: 0 10px;
 	border-radius: 999px;
 }
 
@@ -825,7 +825,7 @@ const Upsert = useUpsert({
 }
 
 .ts-adv-notes li {
-	padding: 2px 0;
+	padding: 0 0;
 	color: var(--el-text-color-secondary);
 }
 
