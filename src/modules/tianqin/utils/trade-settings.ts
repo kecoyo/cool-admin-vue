@@ -95,6 +95,8 @@ export function blankTradeSettings() {
 		t60break: false,
 		t60wobv: false,
 		t60cci: false,
+		pos: 0,
+		entryDate: '',
 		note: ''
 	};
 }
@@ -115,6 +117,8 @@ export function normalizeTradeSettings(o: any) {
 		b.t60break = !!o.t60break;
 		b.t60wobv = !!o.t60wobv;
 		b.t60cci = !!o.t60cci;
+		b.pos = o.pos ? 1 : 0;
+		b.entryDate = o.entryDate == null ? '' : String(o.entryDate);
 		b.note = o.note == null ? '' : String(o.note);
 	}
 	return b;
@@ -149,6 +153,8 @@ export interface TradeSettings {
 	t60break: boolean;
 	t60wobv: boolean;
 	t60cci: boolean;
+	pos: number;
+	entryDate: string;
 	note: string;
 }
 
@@ -166,6 +172,20 @@ const num = (v: any) => (v === '' || v == null || isNaN(Number(v)) ? null : Numb
  */
 export function evaluate(it: TradeSettings): EvaluateResult {
 	const r: EvaluateResult = { level: 'idle', label: '待设置', dir: dirOf(it), notes: [] };
+
+	// 持仓中：最高优先级
+	if (it.pos) {
+		r.level = 'hold';
+		r.label = '★ 持仓中';
+		r.notes.push([
+			'ok',
+			'已标记入场' +
+				(it.entryDate ? `（${it.entryDate}）` : '') +
+				' → 仓位 / 止损 / 出场交给量化软件'
+		]);
+		r.notes.push(['', '离场后点「标记已离场（复位）」，重新等下一次回调']);
+		return r;
+	}
 
 	// 第1步 方向
 	if (!it.ema) {
@@ -255,7 +275,7 @@ export function evaluate(it: TradeSettings): EvaluateResult {
 	r.notes.push(['ok', `60分钟已 ${byDir(T60CCI_TEXT, dir)}（动能确认成立）`]);
 
 	r.level = 'go';
-	r.label = isLong ? '★ 可以买入' : '★ 可以卖出';
+	r.label = isLong ? '可以买入' : '可以卖出';
 	r.notes.push(['ok', '入场条件齐备 → 一次性进场（仓位 / 止损由量化软件管理）']);
 	return r;
 }
@@ -275,6 +295,8 @@ export function formatAdvice(it: TradeSettings): string {
 	});
 	if (r.level === 'go') {
 		text += '执行：一次性进场，仓位/止损/出场由量化软件管理\n';
+	} else if (r.level === 'hold') {
+		text += '状态：持仓中，仓位/止损/出场由量化软件管理\n';
 	}
 	return text.trim();
 }

@@ -537,23 +537,37 @@ const TradeSettingsPanel = defineComponent({
 					/>
 				</div>
 
-				{/* 清空按钮 */}
+				{/* 操作按钮 */}
 				<div class="ts-actions">
-					<el-button
-						size="small"
-						type="danger"
-						plain
-						onClick={() => {
-							skipWatch = true;
-							Object.assign(settings, blankTradeSettings());
-							emit('update:modelValue', '');
-							nextTick(() => {
-								skipWatch = false;
-							});
-						}}
-					>
-						清空品种设置
-					</el-button>
+					{evalResult.value.level === 'go' && (
+						<el-button
+							type="primary"
+							size="small"
+							onClick={() => {
+								settings.pos = 1;
+								settings.entryDate = dayjs().format('YYYY-MM-DD');
+								save();
+							}}
+						>
+							标记已入场
+						</el-button>
+					)}
+					{evalResult.value.level === 'hold' && (
+						<el-button
+							type="danger"
+							size="small"
+							onClick={() => {
+								skipWatch = true;
+								Object.assign(settings, blankTradeSettings());
+								nextTick(() => {
+									skipWatch = false;
+									save();
+								});
+							}}
+						>
+							标记已离场（复位）
+						</el-button>
+					)}
 				</div>
 			</div>
 		);
@@ -779,6 +793,31 @@ const Upsert = useUpsert({
 	background: #159a5b;
 }
 
+.lv-idle {
+	background: #eceef1;
+	color: #5c6673;
+}
+.lv-wait {
+	background: #fdf3e0;
+	color: #8a5a00;
+}
+.lv-ready {
+	background: #e8effc;
+	color: #1f4fa0;
+}
+.lv-go {
+	background: #e6f6ee;
+	color: #0f6b3f;
+}
+.lv-hold {
+	background: #e9e6fb;
+	color: #4a3fa5;
+}
+.lv-stop {
+	background: #f2f3f5;
+	color: #5c6673;
+}
+
 .ts-dir-tag {
 	font-size: 11.5px;
 	font-weight: 500;
@@ -788,33 +827,13 @@ const Upsert = useUpsert({
 
 /* 方向标签：做多红、做空绿 */
 .dir-long .ts-dir-tag {
-	background: rgba(217, 44, 44, 0.12);
-	color: #d92c2c;
+	background: rgba(240, 86, 91, 0.12);
+	color: #f0565b;
 }
 
 .dir-short .ts-dir-tag {
-	background: rgba(21, 154, 91, 0.14);
-	color: #159a5b;
-}
-
-@media (prefers-color-scheme: dark) {
-	.ts-adv-head .ts-dot {
-		background: #8f98a6;
-	}
-	.ts-advice.dir-long .ts-dot {
-		background: #f0565b;
-	}
-	.ts-advice.dir-short .ts-dot {
-		background: #3cbf7e;
-	}
-	.dir-long .ts-dir-tag {
-		background: rgba(240, 86, 91, 0.12);
-		color: #f0565b;
-	}
-	.dir-short .ts-dir-tag {
-		background: rgba(60, 191, 126, 0.14);
-		color: #3cbf7e;
-	}
+	background: rgba(60, 191, 126, 0.14);
+	color: #3cbf7e;
 }
 
 .ts-adv-notes {
@@ -839,6 +858,13 @@ const Upsert = useUpsert({
 
 .ts-adv-notes li.bad {
 	color: var(--el-color-danger);
+}
+
+.ts-adv-actions {
+	margin-top: 12px;
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
 }
 
 /* 备注 */
