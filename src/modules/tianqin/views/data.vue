@@ -637,6 +637,13 @@ const Upsert = useUpsert({
 		try {
 			const settings = JSON.parse(data.tradeSettings);
 			if (settings) {
+				// 如果是空白设置，直接清空 remark
+				if (!settings.ema) {
+					data.remark = '';
+					next(data);
+					return;
+				}
+
 				remark = formatAdvice(settings as TradeSettings);
 			}
 		} catch {
