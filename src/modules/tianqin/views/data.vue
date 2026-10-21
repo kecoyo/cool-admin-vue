@@ -237,19 +237,21 @@ const Table = useTable({
 		{
 			type: 'index',
 			label: '#',
-			width: 60,
+			width: 50,
 			fixed: true
 		},
 		{
 			label: t('合约代码'),
 			prop: 'contractCode',
-			minWidth: 120,
+			minWidth: 100,
+			align: 'left',
 			fixed: true
 		},
 		{
 			label: t('合约名称'),
 			prop: 'contractName',
-			minWidth: 100,
+			minWidth: 120,
+			align: 'left',
 			fixed: true
 		},
 		{
@@ -300,13 +302,13 @@ const Table = useTable({
 		{
 			label: t('小时CCI'),
 			prop: 'hourCciValue',
-			minWidth: 120,
+			minWidth: 100,
 			sortable: 'desc'
 		},
 		{
 			label: t('备注'),
 			prop: 'remark',
-			minWidth: 200,
+			minWidth: 180,
 			component: {
 				name: 'cl-code-json',
 				props: {
@@ -316,29 +318,17 @@ const Table = useTable({
 			sortable: 'desc'
 		},
 		{
-			label: t('周KDJ信号'),
+			label: t('周KDJ'),
 			prop: 'weekKdjSignal',
-			minWidth: 120,
+			minWidth: 100,
 			dict: kdjSignalDict,
 			sortable: 'desc'
 		},
 		{
-			label: t('周KDJ值'),
-			prop: 'weekKdjValue',
-			minWidth: 120,
-			sortable: 'desc'
-		},
-		{
-			label: t('日KDJ信号'),
+			label: t('日KDJ'),
 			prop: 'dayKdjSignal',
 			minWidth: 100,
 			dict: kdjSignalDict,
-			sortable: 'desc'
-		},
-		{
-			label: t('日KDJ值'),
-			prop: 'dayKdjValue',
-			minWidth: 100,
 			sortable: 'desc'
 		},
 		{
