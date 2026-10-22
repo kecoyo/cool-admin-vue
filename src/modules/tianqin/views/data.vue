@@ -101,7 +101,6 @@ import {
 	T60BREAK_TEXT,
 	T60CONFIRM_TEXT,
 	CCI60_TEXT,
-	T60CCI_TEXT,
 	SHORT_TEXT,
 	type TradeSettings
 } from '../utils/trade-settings';
@@ -480,12 +479,8 @@ const TradeSettingsPanel = defineComponent({
 							<el-checkbox v-model={settings.t60wobv} />
 							<span>{byDir(T60CONFIRM_TEXT, dir.value)}</span>
 						</label>
-						<label class="ts-opt">
-							<el-checkbox v-model={settings.t60cci} />
-							<span>{byDir(T60CCI_TEXT, dir.value)}</span>
-						</label>
 						<p class="ts-hint">
-							三条都满足，入场时机才算成立；等 60分钟K线收盘确认，不盘中抢跑。
+							两条都满足，入场时机才算成立；等 60分钟K线收盘确认，不盘中抢跑。
 						</p>
 					</div>
 				</div>

@@ -59,12 +59,6 @@ export const CCI60_MIN = {
 	neutral: 'CCI(60) 穿越 ±100'
 };
 
-export const T60CCI_TEXT = {
-	long: 'CCI60 上穿下降趋势线',
-	short: 'CCI60 下穿上升趋势线',
-	neutral: 'CCI60 上穿 / 下穿趋势线'
-};
-
 export function byDir(map: Record<string, string>, dir: string): string {
 	return map[dir] || map.neutral;
 }
@@ -94,7 +88,6 @@ export function blankTradeSettings() {
 		},
 		t60break: false,
 		t60wobv: false,
-		t60cci: false,
 		pos: 0,
 		entryDate: '',
 		note: ''
@@ -116,7 +109,6 @@ export function normalizeTradeSettings(o: any) {
 		}
 		b.t60break = !!o.t60break;
 		b.t60wobv = !!o.t60wobv;
-		b.t60cci = !!o.t60cci;
 		b.pos = o.pos ? 1 : 0;
 		b.entryDate = o.entryDate == null ? '' : String(o.entryDate);
 		b.note = o.note == null ? '' : String(o.note);
@@ -152,7 +144,6 @@ export interface TradeSettings {
 	};
 	t60break: boolean;
 	t60wobv: boolean;
-	t60cci: boolean;
 	pos: number;
 	entryDate: string;
 	note: string;
@@ -265,14 +256,6 @@ export function evaluate(it: TradeSettings): EvaluateResult {
 		return r;
 	}
 	r.notes.push(['ok', `60分钟已 ${byDir(T60CONFIRM_TEXT, dir)}（确认成立）`]);
-
-	if (!it.t60cci) {
-		r.level = 'wait';
-		r.label = '等待趋势线确认';
-		r.notes.push(['warn', `60分钟 ${byDir(T60CCI_TEXT, dir)} 尚未出现 → 等确认`]);
-		return r;
-	}
-	r.notes.push(['ok', `60分钟已 ${byDir(T60CCI_TEXT, dir)}（动能确认成立）`]);
 
 	r.level = 'go';
 	r.label = isLong ? '可以买入' : '可以卖出';
